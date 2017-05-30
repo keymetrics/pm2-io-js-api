@@ -1,0 +1,38 @@
+{
+  "name": "km.js",
+  "version": "0.0.1",
+  "description": "Official Keymetrics API Client for Javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymetrics/km.js.git"
+  },
+  "keywords": [
+    "keymetrics",
+    "api",
+    "dashboard",
+    "monitoring",
+    "wrapper"
+  ],
+  "author": "Keymetrics Team",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/keymetrics/km.js/issues"
+  },
+  "homepage": "https://github.com/keymetrics/km.js#readme",
+  "dependencies": {
+    "axios": "^0.16.1",
+    "eventemitter2": "^2.1.2",
+    "ws": "^1.1.1"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "jsdoc": "^3.4.2",
+    "minami": "^1.1.1",
+    "mocha": "^3.0.2",
+    "uglify": "^0.1.5"
+  }
+}
