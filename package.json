@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/keymetrics/km.js#readme",
   "dependencies": {
+    "async": "^2.4.1",
     "axios": "^0.16.1",
     "eventemitter2": "^2.1.2",
     "ws": "^1.1.1"
