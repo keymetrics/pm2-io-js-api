@@ -81,7 +81,7 @@ module.exports = class HttpWrapper {
     if (flowMeta.condition && constants.ENVIRONNEMENT !== flowMeta.condition) {
       throw new Error(`The flow ${flow} is reserved for ${flowMeta.condition} environement`)
     }
-    let FlowImpl = flowMeta.nodule
+    let FlowImpl = require(flowMeta.path)
     this.oauth_flow = new FlowImpl(opts)
     return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this))
   }
