@@ -1,4 +1,4 @@
-/* global URLSearchParams, localStorage */
+/* global URLSearchParams, URL, localStorage */
 'use strict'
 
 const AuthStrategy = require('./strategy')

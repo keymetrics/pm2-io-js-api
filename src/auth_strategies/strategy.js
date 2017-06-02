@@ -24,15 +24,16 @@ const AuthStrategy = class AuthStrategy {
   static implementations (name) {
     const flows = {
       'embed': {
-        path: `${__dirname}/embed_strategy`,
+        nodule: require('./embed_strategy'),
         condition: 'node'
       },
       'browser': {
-        path: `${__dirname}/browser_strategy`,
+        nodule: require('./browser_strategy'),
         condition: 'browser'
       },
       'standalone': {
-        path: `${__dirname}/standalone_strategy`
+        nodule: require('./standalone_strategy'),
+        condition: null
       }
     }
     return name ? flows[name] : null
