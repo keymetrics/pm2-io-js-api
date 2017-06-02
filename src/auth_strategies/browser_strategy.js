@@ -1,4 +1,4 @@
-/* global RLSearchParams, localStorage */
+/* global URLSearchParams, localStorage */
 'use strict'
 
 const AuthStrategy = require('./strategy')
@@ -14,8 +14,9 @@ module.exports = class BrowserFlow extends AuthStrategy {
     }
 
     // parse the url since it can contain tokens
-    let content = window.location[this._opts.response_mode]
-    let params = new RLSearchParams(content)
+    let url = new URL(window.location)
+    this.response_mode = this.response_mode === 'query' ? 'search' : this.response_mode
+    let params = new URLSearchParams(url[this.response_mode])
 
     if (params.get('access_token') !== null) {
       // verify that the access_token in parameters is valid

@@ -78,10 +78,11 @@ module.exports = class HttpWrapper {
     }
     let flowMeta = AuthStrategy.implementations(flow)
     // verify that the environnement condition is meet
+    
     if (flowMeta.condition && constants.ENVIRONNEMENT !== flowMeta.condition) {
-      throw new Error(`The flow ${flow} is reserved for ${flowMeta.condition} environement`)
+      throw new Error(`The flow ${flow} is reserved for ${flowMeta.condition} environ sment`)
     }
-    let FlowImpl = require(flowMeta.path)
+    let FlowImpl = require('./auth_strategies/browser_strategy')
     this.oauth_flow = new FlowImpl(opts)
     return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this))
   }
