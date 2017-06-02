@@ -1181,6 +1181,1093 @@
             "namespace": "user"
         }
     ],
+    "bucket": [
+        {
+            "route": {
+                "name": "/api/bucket/:id/feedback",
+                "type": "PUT"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "feedback",
+                    "type": "string",
+                    "description": "the feedback text",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "400",
+                    "description": "missing feedback field",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully registered the feedback",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": "feedback",
+                    "type": "string",
+                    "description": "the feedback that hasn't been registered",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "sendFeedback",
+            "longname": "bucket.sendFeedback",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "retrieveUsers",
+            "route": {
+                "name": "/api/bucket/:id/users_authorized",
+                "type": "GET"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully retrieved bucket's members",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "array",
+                    "description": "a array of user containing their email, username and roles",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.retrieveUsers",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "currentRole",
+            "route": {
+                "name": "/api/bucket/:id/current_role",
+                "type": "GET"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "200",
+                    "description": "succesfully retrieved the use role",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": "role",
+                    "type": "string",
+                    "description": "the user role",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.currentRole",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id/manage_notif",
+                "type": "POST"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "email",
+                    "type": "string",
+                    "description": "the user email",
+                    "optional": false,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "state",
+                    "type": "string",
+                    "description": "the notification state you want to set for that user\n (either 'email' or 'nonde)",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "404",
+                    "description": "user not found",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "array",
+                    "description": "array of state for each user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "setNotificationState",
+            "longname": "bucket.setNotificationState",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "inviteUser",
+            "route": {
+                "name": "/api/bucket/:id/add_user",
+                "type": "POST"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "email",
+                    "type": "string",
+                    "description": "the email of the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "missing/invalid parameters",
+                    "optional": false
+                },
+                {
+                    "type": "403",
+                    "description": "you cant invit more users because you hit the bucket limit",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully invited the user (either directly or by email)",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": "invitations",
+                    "type": "array",
+                    "description": "the list of invitations actually active",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.inviteUser",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id/invitation/:email",
+                "type": "DELETE"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                },
+                {
+                    "name": ":email",
+                    "type": "string",
+                    "description": "the email of the invitation you want to delete",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "invalid/missing parameters",
+                    "optional": false
+                },
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully deleted the invitation",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": "invitations",
+                    "type": "array",
+                    "description": "the list of invitations actually active",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "removeInvitation",
+            "longname": "bucket.removeInvitation",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id/remove_user",
+                "type": "POST"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "email",
+                    "type": "string",
+                    "description": "the email of the user you want to remove",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "missing/invalid parameters",
+                    "optional": false
+                },
+                {
+                    "type": "404",
+                    "description": "user not found",
+                    "optional": false
+                },
+                {
+                    "type": "403",
+                    "description": "impossible to remove the owner from the bucket",
+                    "optional": false
+                },
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "array",
+                    "description": "a array of user containing their email, username and roles",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "removeUser",
+            "longname": "bucket.removeUser",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id/promote_user",
+                "type": "POST"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "email",
+                    "type": "string",
+                    "description": "the email of the user you want to change the role",
+                    "optional": false,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "role",
+                    "type": "string",
+                    "description": "the role you want to set",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "invalid/missing parameters",
+                    "optional": false
+                },
+                {
+                    "type": "404",
+                    "description": "user not found",
+                    "optional": false
+                },
+                {
+                    "type": "403",
+                    "description": "impossible to set the role of the owner",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "array",
+                    "description": "a array of user containing their email, username and roles",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "setUserRole",
+            "longname": "bucket.setUserRole",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "retrieveAll",
+            "route": {
+                "name": "/api/bucket/",
+                "type": "GET"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully fetched bucket",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "array",
+                    "description": "array of buckets",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.retrieveAll",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "create",
+            "route": {
+                "name": "/api/bucket/create_classic",
+                "type": "POST"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "body": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "description": "the name of the bucket",
+                    "optional": false,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "comment",
+                    "type": "string",
+                    "description": "any comments that will be written under the bucket name",
+                    "optional": true,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "app_url",
+                    "type": "string",
+                    "description": "",
+                    "optional": true,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "missing parameters",
+                    "optional": false
+                },
+                {
+                    "type": "403",
+                    "description": "you cant create any more bucket",
+                    "optional": false
+                },
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully created a bucket",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": "bucket",
+                    "type": "object",
+                    "description": "the created bucket",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.create",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id/start_trial",
+                "type": "PUT"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "can't claim trial",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "trial launched",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": "duration",
+                    "type": "string",
+                    "description": "the duration of the trial",
+                    "optional": false,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "plan",
+                    "type": "string",
+                    "description": "the plan of the trial",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "claimTrial",
+            "longname": "bucket.claimTrial",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "upgrade",
+            "route": {
+                "name": "/api/bucket/:id/upgrade",
+                "type": "POST"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "plan",
+                    "type": "string",
+                    "description": "name of the plan to upgrade to",
+                    "optional": false,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "stripe_token",
+                    "type": "string",
+                    "description": "a card token created by stripe",
+                    "optional": true,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "coupon_id",
+                    "type": "string",
+                    "description": "the id of the stripe coupon",
+                    "optional": true,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "missing/invalid parameters",
+                    "optional": false
+                },
+                {
+                    "type": "403",
+                    "description": "need a credit card OR not allowed to subscribe to the plan",
+                    "optional": false
+                },
+                {
+                    "type": "500",
+                    "description": "stripe/database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully upgraded",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": "bucket",
+                    "type": "object",
+                    "description": "the bucket object",
+                    "optional": false,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "subscription",
+                    "type": "object",
+                    "description": "the subscription object attached to the subscription",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.upgrade",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "retrieve",
+            "route": {
+                "name": "/api/bucket/:id",
+                "type": "GET"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "200",
+                    "description": "succesfully retrieved the bucket",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "object",
+                    "description": "bucket object",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.retrieve",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id",
+                "type": "PUT"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "name",
+                    "type": "string",
+                    "description": "",
+                    "optional": true,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "comment",
+                    "type": "string",
+                    "description": "",
+                    "optional": true,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "app_url",
+                    "type": "string",
+                    "description": "",
+                    "optional": true,
+                    "defaultvalue": null
+                },
+                {
+                    "name": "configuration",
+                    "type": "string",
+                    "description": "",
+                    "optional": true,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "400",
+                    "description": "missing parameters",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "object",
+                    "description": "bucket object",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "update",
+            "longname": "bucket.update",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "retrieveServers",
+            "route": {
+                "name": "/api/bucket/:id/meta_servers",
+                "type": "GET"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully retrieved the server's metadata",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "array",
+                    "description": "servers metadata",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.retrieveServers",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "name": "getSubscription",
+            "route": {
+                "name": "/api/bucket/:id/subscription",
+                "type": "GET"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "404",
+                    "description": "the bucket doesnt have any subscription",
+                    "optional": false
+                },
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully retrieved the subscription",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "object",
+                    "description": "subscription object",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "longname": "bucket.getSubscription",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id",
+                "type": "DELETE"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "code": [
+                {
+                    "type": "500",
+                    "description": "database error",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully deleted the bucket",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "object",
+                    "description": "the deleted bucket",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "destroy",
+            "longname": "bucket.destroy",
+            "scope": "route",
+            "namespace": "bucket"
+        },
+        {
+            "route": {
+                "name": "/api/bucket/:id/transfer_ownership",
+                "type": "POST"
+            },
+            "authentication": true,
+            "header": [
+                {
+                    "name": "Authorization",
+                    "type": "string",
+                    "description": "bearer access token issued for the user",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "params": [
+                {
+                    "name": ":id",
+                    "type": "string",
+                    "description": "bucket id",
+                    "optional": false
+                }
+            ],
+            "body": [
+                {
+                    "name": "new_owner",
+                    "type": "string",
+                    "description": "the wanted owner's email",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "code": [
+                {
+                    "type": "400",
+                    "description": "Missing/invalid parameters",
+                    "optional": false
+                },
+                {
+                    "type": "404",
+                    "description": "user not found",
+                    "optional": false
+                },
+                {
+                    "type": "403",
+                    "description": "the new owner need to have a active credit card",
+                    "optional": false
+                },
+                {
+                    "type": "200",
+                    "description": "succesfully transfered the bucket, old owner is now admin",
+                    "optional": false
+                }
+            ],
+            "response": [
+                {
+                    "name": ".",
+                    "type": "object",
+                    "description": "bucket object",
+                    "optional": false,
+                    "defaultvalue": null
+                }
+            ],
+            "name": "transferOwnership",
+            "longname": "bucket.transferOwnership",
+            "scope": "route",
+            "namespace": "bucket"
+        }
+    ],
     "auth": [
         {
             "name": "retrieveToken",

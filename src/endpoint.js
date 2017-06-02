@@ -12,7 +12,7 @@ module.exports = class Endpoint {
     let endpoint = this
     return function () {
       return new Promise((resolve, reject) => {
-        RequestValidator.extract(endpoint, arguments)
+        RequestValidator.extract(endpoint, Array.prototype.slice.call(arguments))
           .then((opts) => {
             http.request(opts).then(resolve, reject)
           })

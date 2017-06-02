@@ -14,8 +14,12 @@ module.exports = class RequestValidator {
     return new Promise((resolve, reject) => {
       let httpOpts = {
         params: {},
-        data: {}
+        data: {},
+        url: endpoint.route.name + '',
+        method: endpoint.route.type,
+        authentication: endpoint.authentication || false
       }
+
       switch (endpoint.route.type) {
         // GET request, we assume data will only be in the query or url params
         case 'GET': {
@@ -25,7 +29,7 @@ module.exports = class RequestValidator {
             if (typeof value !== 'string') {
               return reject(new Error(`Expected to receive string argument for ${param.name} to match but got ${value}`))
             }
-            endpoint.route.name.replace(param.name, value)
+            httpOpts.url = httpOpts.url.replace(param.name, value)
           }
           for (let param of (endpoint.query || [])) {
             let value = args.shift()
@@ -48,7 +52,7 @@ module.exports = class RequestValidator {
               return reject(new Error(`Expected to receive string argument for ${param.name} to match but got ${value}`))
             }
             // replace param in url
-            endpoint.route.name.replace(param.name, value)
+            httpOpts.url = httpOpts.url.replace(param.name, value)
           }
           let data = args[0]
           if (typeof data !== 'object') {
@@ -84,7 +88,7 @@ module.exports = class RequestValidator {
             if (typeof value !== 'string') {
               return reject(new Error(`Expected to receive string argument for ${param.name} to match but got ${value}`))
             }
-            endpoint.route.name.replace(param.name, value)
+            httpOpts.url = httpOpts.url.replace(param.name, value)
           }
           for (let param of (endpoint.query || [])) {
             let value = args.shift()
@@ -100,11 +104,6 @@ module.exports = class RequestValidator {
           return reject(new Error(`Invalid endpoint declaration, invalid method ${endpoint.route.type} found`))
         }
       }
-
-      // now that we have parsed the mandatory arg, we can return the options
-      httpOpts.url = endpoint.route.name
-      httpOpts.method = endpoint.route.type
-      httpOpts.authentication = endpoint.authentication || false
       return resolve(httpOpts)
     })
   }
