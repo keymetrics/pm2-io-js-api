@@ -14,6 +14,7 @@ module.exports = class HttpWrapper {
       refresh_token: null,
       access_token: null
     }
+    this.buckets = []
     this.authenticated = false
     this.queue = []
     this._axios = axios.create(opts)
@@ -32,6 +33,14 @@ module.exports = class HttpWrapper {
   }
 
   request (httpOpts) {
+    if (httpOpts.url.match(/bucket/)) {
+      let bucketID = httpOpts.url.split('/')[3]
+      let node = this.buckets.filter(bucket => bucket._id === bucketID).map(bucket => bucket.node_cache)[0]
+      if (node && node.endpoints) {
+        httpOpts.baseURL = node.endpoints.web
+      }
+    }
+
     return new Promise((resolve, reject) => {
       if (this.authenticated === false && httpOpts.authentication === true) {
         logger(`Queued request to ${httpOpts.url}`)
@@ -58,8 +67,15 @@ module.exports = class HttpWrapper {
     if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens')
 
     this.tokens = data
-    this.authenticated = true
     this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
+    this._axios.request({ url: '/api/bucket', method: 'GET' })
+      .then((res) => {
+        this.buckets = res.data
+        this.authenticated = true
+      }).catch((err) => {
+        console.error('Error while retrieving buckets')
+        console.error(err)
+      })
   }
 
   useStrategy (flow, opts) {
