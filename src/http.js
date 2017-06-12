@@ -4,6 +4,7 @@
 const axios = require('axios')
 const AuthStrategy = require('./auth_strategies/strategy')
 const constants = require('../constants')
+const logger = require('./utils/debug')('http')
 
 module.exports = class HttpWrapper {
   constructor (opts) {
@@ -33,7 +34,7 @@ module.exports = class HttpWrapper {
   request (httpOpts) {
     return new Promise((resolve, reject) => {
       if (this.authenticated === false && httpOpts.authentication === true) {
-        console.log(`Queued request to ${httpOpts.url}`)
+        logger(`Queued request to ${httpOpts.url}`)
         this.queue.push({
           resolve,
           reject,
@@ -50,7 +51,10 @@ module.exports = class HttpWrapper {
    * @param {String} accessToken the token you want to use
    */
   updateTokens (err, data) {
-    if (err) throw err
+    if (err) {
+      console.error(`Error while retrieving tokens : ${err.message}`)
+      return console.error(err.response.data)
+    }
     if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens')
 
     this.tokens = data

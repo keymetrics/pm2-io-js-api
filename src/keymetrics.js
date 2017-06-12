@@ -3,9 +3,9 @@
 
 const mapping = require('./api_mappings.json')
 const Namespace = require('./namespace')
-const Endpoint = require('./endpoint')
 const HttpWrapper = require('./http')
 const constants = require('../constants')
+const logger = require('./utils/debug')()
 
 const Keymetrics = class Keymetrics {
  /**
@@ -15,29 +15,34 @@ const Keymetrics = class Keymetrics {
  * @param {object} opts The options are passed to the children instances
  */
   constructor (opts) {
+    logger('init keymetrics instance')
     this.opts = Object.assign(constants, opts)
 
     this.version = 1
+
+    logger('init http client')
     this.http = new HttpWrapper(this.opts)
+
     // build namespaces at startup
-    Object.assign(this, this.buildNamespaces())
+    logger('building namespaces')
+    let namespaces = this.buildNamespaces()
+
+    delete namespaces.name
+    delete namespaces.opts
+
+    logger('exposing namespaces')
+    Object.assign(this, namespaces)
+    Object.assign(Keymetrics, namespaces)
+    logger(`namespaces : ${Object.keys(this)}`)
   }
 
   buildNamespaces () {
-    let namespaces = {}
-    // retrieve all namespace available
-    for (let name in mapping) {
-      // create a instance for each of them
-      let namespace = new Namespace({ name, http: this.http })
-      // retrieve all endpoint defined in the mapping
-      for (let endpoint of mapping[name]) {
-        // and create endpoint instance of each of them
-        namespace.addEndpoint(new Endpoint(endpoint))
-      }
-      namespaces[name] = namespace
-      module.exports[name] = namespace
-    }
-    return namespaces
+    // create the root namespace
+    let root = new Namespace(mapping, {
+      name: 'root',
+      http: this.http
+    })
+    return root
   }
 
   /**
@@ -46,6 +51,7 @@ const Keymetrics = class Keymetrics {
    * @param {Object} opts
    */
   use (flow, opts) {
+    logger(`using ${flow} authentication strategy`)
     this.http.useStrategy(flow, opts)
     return this
   }
