@@ -25,24 +25,17 @@ const Keymetrics = class Keymetrics {
 
     // build namespaces at startup
     logger('building namespaces')
-    let namespaces = this.buildNamespaces()
-
-    delete namespaces.name
-    delete namespaces.opts
-
-    logger('exposing namespaces')
-    Object.assign(this, namespaces)
-    Object.assign(Keymetrics, namespaces)
-    logger(`namespaces : ${Object.keys(this)}`)
-  }
-
-  buildNamespaces () {
-    // create the root namespace
     let root = new Namespace(mapping, {
       name: 'root',
       http: this.http
     })
-    return root
+    logger('exposing namespaces')
+    for (let key in root) {
+      if (key === 'name' || key === 'opts') continue
+      this[key] = root[key]
+      Keymetrics[key] = root[key]
+    }
+    logger(`attached namespaces : ${Object.keys(this)}`)
   }
 
   /**
