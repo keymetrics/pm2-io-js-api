@@ -1,10 +1,14 @@
 {
-  "name": "km.js",
+  "name": "keymetrics.js",
   "version": "0.0.1",
   "description": "Official Keymetrics API Client for Javascript",
   "main": "index.js",
   "scripts": {
-    "test": "exit 1"
+    "test": "exit 1",
+    "build": "browserify -s Keymetrics -r ./ > ./dist/keymetrics.es5.js",
+    "dist": "browserify -s Keymetrics -r ./ | uglifyjs -c warnings=false -m > ./dist/keymetrics.es5.min.js",
+    "doc": "jsdoc -r ./src --readme ./README.md -d doc -t ./node_modules/minami",
+    "clean": "rm dist/*"
   },
   "repository": {
     "type": "git",
@@ -34,7 +38,26 @@
     "jsdoc": "^3.4.2",
     "minami": "^1.1.1",
     "mocha": "^3.0.2",
-    "uglify": "^0.1.5"
+    "uglify-js": "*",
+    "babel-preset-es2015": "*",
+    "babel-preset-stage-2": "*",
+    "babelify": "*"
+  },
+  "browserify": {
+    "debug" : "true",
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            ["babel-preset-es2015", {
+              "debug" : "true",
+              "sourceMaps": "true"
+            }]
+          ]
+        }
+      ]
+    ]
   },
   "browser": {
     "./src/auth_strategies/embed_strategy.js": "./src/auth_strategies/browser_strategy.js"
