@@ -3,8 +3,8 @@
 
 const mapping = require('./api_mappings.json')
 const Namespace = require('./namespace')
-const HttpWrapper = require('./http')
 const constants = require('../constants')
+const NetworkWrapper = require('./network')
 const logger = require('./utils/debug')()
 
 const Keymetrics = class Keymetrics {
@@ -18,24 +18,25 @@ const Keymetrics = class Keymetrics {
     logger('init keymetrics instance')
     this.opts = Object.assign(constants, opts)
 
-    this.version = 1
-
-    logger('init http client')
-    this.http = new HttpWrapper(this.opts)
+    logger('init network client (http/ws)')
+    this._network = new NetworkWrapper(this.opts)
 
     // build namespaces at startup
     logger('building namespaces')
     let root = new Namespace(mapping, {
       name: 'root',
-      http: this.http
+      http: this._network
     })
     logger('exposing namespaces')
     for (let key in root) {
       if (key === 'name' || key === 'opts') continue
       this[key] = root[key]
       Keymetrics[key] = root[key]
+      exports[key] = root[key]
     }
     logger(`attached namespaces : ${Object.keys(this)}`)
+
+    this.realtime = this._network.realtime
   }
 
   /**
@@ -45,7 +46,7 @@ const Keymetrics = class Keymetrics {
    */
   use (flow, opts) {
     logger(`using ${flow} authentication strategy`)
-    this.http.useStrategy(flow, opts)
+    this._network.useStrategy(flow, opts)
     return this
   }
 }

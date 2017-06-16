@@ -5,8 +5,11 @@ const axios = require('axios')
 const AuthStrategy = require('./auth_strategies/strategy')
 const constants = require('../constants')
 const logger = require('./utils/debug')('http')
+const WS = require('./utils/websocket')
+const EventEmitter = require('eventemitter3')
+const km = require('./keymetrics')
 
-module.exports = class HttpWrapper {
+module.exports = class NetworkWrapper {
   constructor (opts) {
     opts.baseURL = opts.API_URL || 'https://api.keymetrics.io'
     this.opts = opts
@@ -14,19 +17,28 @@ module.exports = class HttpWrapper {
       refresh_token: null,
       access_token: null
     }
-    this.buckets = []
-    this.authenticated = false
-    this.queue = []
+    this._buckets = []
+    this._queue = []
     this._axios = axios.create(opts)
     this._queueWorker = setInterval(this.queueUpdater.bind(this), 100)
+    this._websockets = []
+
+    this.realtime = new EventEmitter({
+      wildcard: true,
+      delimiter: ':',
+      newListener: false,
+      maxListeners: 20
+    })
+    this.realtime.subscribe = this.subscribe.bind(this)
+    this.authenticated = false
   }
 
   queueUpdater () {
     if (this.authenticated === false) return
 
     // when we are authenticated we can clear the queue
-    while (this.queue.length > 0) {
-      let promise = this.queue.shift()
+    while (this._queue.length > 0) {
+      let promise = this._queue.shift()
       // make the request
       this.request(promise.request).then(promise.resolve, promise.reject)
     }
@@ -35,7 +47,7 @@ module.exports = class HttpWrapper {
   request (httpOpts) {
     if (httpOpts.url.match(/bucket/)) {
       let bucketID = httpOpts.url.split('/')[3]
-      let node = this.buckets.filter(bucket => bucket._id === bucketID).map(bucket => bucket.node_cache)[0]
+      let node = this._buckets.filter(bucket => bucket._id === bucketID).map(bucket => bucket.node_cache)[0]
       if (node && node.endpoints) {
         httpOpts.baseURL = node.endpoints.web
       }
@@ -44,13 +56,13 @@ module.exports = class HttpWrapper {
     return new Promise((resolve, reject) => {
       if (this.authenticated === false && httpOpts.authentication === true) {
         logger(`Queued request to ${httpOpts.url}`)
-        this.queue.push({
+        this._queue.push({
           resolve,
           reject,
           request: httpOpts
         })
       } else {
-        this._axios.request(httpOpts).then(resolve, reject)
+        this._axios.request(httpOpts).then(resolve).catch(reject)
       }
     })
   }
@@ -62,7 +74,7 @@ module.exports = class HttpWrapper {
   updateTokens (err, data) {
     if (err) {
       console.error(`Error while retrieving tokens : ${err.message}`)
-      return console.error(err.response.data)
+      return console.error(err.response ? err.response.data : err.stack)
     }
     if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens')
 
@@ -70,11 +82,11 @@ module.exports = class HttpWrapper {
     this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
     this._axios.request({ url: '/api/bucket', method: 'GET' })
       .then((res) => {
-        this.buckets = res.data
+        this._buckets = res.data
         this.authenticated = true
       }).catch((err) => {
         console.error('Error while retrieving buckets')
-        console.error(err)
+        console.error(err.response ? err.response.data : err)
       })
   }
 
@@ -105,5 +117,69 @@ module.exports = class HttpWrapper {
     let FlowImpl = flowMeta.nodule
     this.oauth_flow = new FlowImpl(opts)
     return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this))
+  }
+
+  subscribe (bucketId, opts, cb) {
+    if (typeof opts === 'function') {
+      cb = opts
+      opts = {}
+    }
+
+    if (this.authenticated === false) {
+      return cb(new Error(`You can subscribe while being unauthenticated`))
+    }
+
+    km.bucket.retrieve(bucketId)
+      .then((res) => {
+        let bucket = res.data
+
+        let endpoint = bucket.node_cache.endpoints.web
+        if (this.opts.IS_DEBUG) {
+          endpoint = endpoint.replace(':3000', ':4020')
+        }
+
+        // connect primus to a bucket
+        let socket = new WS(`${endpoint}/primus/?token=${this.tokens.access_token}`)
+        socket.connected = false
+        socket.bucket = bucketId
+
+        let onConnect = () => {
+          socket.connected = true
+          this.realtime.emit(`${bucket.public_id}:connected`)
+
+          socket.send(JSON.stringify({
+            action: 'active',
+            public_id: bucket.public_id
+          }))
+        }
+        socket.onopen = onConnect
+        socket.onreconnect = onConnect
+
+        socket.onerror = (err) => {
+          this.realtime.emit(`${bucket.public_id}:error`, err)
+        }
+
+        socket.onclose = () => {
+          socket.connected = false
+          this.realtime.emit(`${bucket.public_id}:disconnected`)
+        }
+
+        // broadcast in the bus
+        socket.onmessage = (data) => {
+          data = JSON.parse(data.data).data[1]
+          Object.keys(data).forEach((event) => {
+            if (event === 'server_name') return
+            this.realtime.emit(`${bucket.public_id}:${data.server_name || 'none'}:${event}`, data[event])
+          })
+        }
+
+        this._websockets.push(socket)
+      }).catch((err) => {
+        if (err.response) {
+          return cb(new Error(err.response.data.msg))
+        } else {
+          return cb(err)
+        }
+      })
   }
 }
