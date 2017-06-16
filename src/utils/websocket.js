@@ -3,7 +3,7 @@
 'use strict'
 
 const ws = require('ws')
-const debug = require('debug')('ws-bus')
+const debug = require('./debug')('ws-bus')
 
 const _WebSocket = typeof ws !== 'function' ? WebSocket : ws
 

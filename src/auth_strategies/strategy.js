@@ -6,7 +6,7 @@ const constants = require('../../constants.js')
 const AuthStrategy = class AuthStrategy {
   constructor (opts) {
     this._opts = opts
-    this.client_id = opts.client_id
+    this.client_id = opts.client_id || opts.OAUTH_CLIENT_ID
     if (!this.client_id) {
       throw new Error('You must always provide a application id for any of the strategies')
     }

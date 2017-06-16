@@ -2,9 +2,9 @@
 const pkg = require('./package.json')
 
 const config = {
-  API_URL: 'http://cl1.km.io:3000',
+  API_URL: 'https://app.keymetrics.io',
   OAUTH_AUTHORIZE_ENDPOINT: '/api/oauth/authorize',
-  OAUTH_CLIENT_ID: 4228578805,
+  OAUTH_CLIENT_ID: '795984050',
   ENVIRONNEMENT: process && process.versions && process.versions.node ? 'node' : 'browser',
   VERSION: pkg.version,
   // put in debug when using km.io with browser OR when DEBUG=true with nodejs

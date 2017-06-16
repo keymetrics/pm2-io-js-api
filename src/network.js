@@ -119,67 +119,56 @@ module.exports = class NetworkWrapper {
     return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this))
   }
 
-  subscribe (bucketId, opts, cb) {
-    if (typeof opts === 'function') {
-      cb = opts
-      opts = {}
-    }
+  subscribe (bucketId, opts) {
+    return new Promise((resolve, reject) => {
+      km.bucket.retrieve(bucketId)
+        .then((res) => {
+          let bucket = res.data
 
-    if (this.authenticated === false) {
-      return cb(new Error(`You can subscribe while being unauthenticated`))
-    }
+          let endpoint = bucket.node_cache.endpoints.web
+          if (this.opts.IS_DEBUG) {
+            endpoint = endpoint.replace(':3000', ':4020')
+          }
+          endpoint = endpoint.replace('http', 'ws')
 
-    km.bucket.retrieve(bucketId)
-      .then((res) => {
-        let bucket = res.data
-
-        let endpoint = bucket.node_cache.endpoints.web
-        if (this.opts.IS_DEBUG) {
-          endpoint = endpoint.replace(':3000', ':4020')
-        }
-
-        // connect primus to a bucket
-        let socket = new WS(`${endpoint}/primus/?token=${this.tokens.access_token}`)
-        socket.connected = false
-        socket.bucket = bucketId
-
-        let onConnect = () => {
-          socket.connected = true
-          this.realtime.emit(`${bucket.public_id}:connected`)
-
-          socket.send(JSON.stringify({
-            action: 'active',
-            public_id: bucket.public_id
-          }))
-        }
-        socket.onopen = onConnect
-        socket.onreconnect = onConnect
-
-        socket.onerror = (err) => {
-          this.realtime.emit(`${bucket.public_id}:error`, err)
-        }
-
-        socket.onclose = () => {
+          // connect primus to a bucket
+          let socket = new WS(`${endpoint}/primus/?token=${this.tokens.access_token}`)
           socket.connected = false
-          this.realtime.emit(`${bucket.public_id}:disconnected`)
-        }
+          socket.bucket = bucketId
 
-        // broadcast in the bus
-        socket.onmessage = (data) => {
-          data = JSON.parse(data.data).data[1]
-          Object.keys(data).forEach((event) => {
-            if (event === 'server_name') return
-            this.realtime.emit(`${bucket.public_id}:${data.server_name || 'none'}:${event}`, data[event])
-          })
-        }
+          let onConnect = () => {
+            socket.connected = true
+            this.realtime.emit(`${bucket.public_id}:connected`)
 
-        this._websockets.push(socket)
-      }).catch((err) => {
-        if (err.response) {
-          return cb(new Error(err.response.data.msg))
-        } else {
-          return cb(err)
-        }
-      })
+            socket.send(JSON.stringify({
+              action: 'active',
+              public_id: bucket.public_id
+            }))
+          }
+          socket.onopen = onConnect
+          socket.onreconnect = onConnect
+
+          socket.onerror = (err) => {
+            this.realtime.emit(`${bucket.public_id}:error`, err)
+          }
+
+          socket.onclose = () => {
+            socket.connected = false
+            this.realtime.emit(`${bucket.public_id}:disconnected`)
+          }
+
+          // broadcast in the bus
+          socket.onmessage = (data) => {
+            data = JSON.parse(data.data).data[1]
+            Object.keys(data).forEach((event) => {
+              if (event === 'server_name') return
+              this.realtime.emit(`${bucket.public_id}:${data.server_name || 'none'}:${event}`, data[event])
+            })
+          }
+
+          this._websockets.push(socket)
+          return resolve(socket)
+        }).catch(reject)
+    })
   }
 }
