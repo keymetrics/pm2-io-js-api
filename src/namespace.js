@@ -2,7 +2,7 @@
 'use strict'
 
 const Endpoint = require('./endpoint')
-const logger = require('./utils/debug')('namespace')
+const logger = require('debug')('kmjs:namespace')
 
 module.exports = class Namespace {
   constructor (mapping, opts) {

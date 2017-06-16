@@ -5,7 +5,7 @@ const mapping = require('./api_mappings.json')
 const Namespace = require('./namespace')
 const constants = require('../constants')
 const NetworkWrapper = require('./network')
-const logger = require('./utils/debug')()
+const logger = require('debug')('kmjs')
 
 const Keymetrics = class Keymetrics {
  /**

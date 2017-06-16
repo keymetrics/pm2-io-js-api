@@ -4,7 +4,7 @@
 const axios = require('axios')
 const AuthStrategy = require('./auth_strategies/strategy')
 const constants = require('../constants')
-const logger = require('./utils/debug')('http')
+const logger = require('debug')('kmjs:network')
 const WS = require('./utils/websocket')
 const EventEmitter = require('eventemitter2')
 const km = require('./keymetrics')
@@ -169,6 +169,14 @@ module.exports = class NetworkWrapper {
           this._websockets.push(socket)
           return resolve(socket)
         }).catch(reject)
+    })
+  }
+
+  unsubscribe (bucketId, opts) {
+    opts = opts || {}
+    return new Promise((resolve, reject) => {
+      let socket = this._websockets.find(socket => socket.bucketId === bucketId)
+      socket.end()
     })
   }
 }
