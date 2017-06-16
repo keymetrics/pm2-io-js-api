@@ -5,12 +5,15 @@ const axios = require('axios')
 const AuthStrategy = require('./auth_strategies/strategy')
 const constants = require('../constants')
 const logger = require('debug')('kmjs:network')
+const loggerHttp = require('debug')('kmjs:network:http')
+const loggerWS = require('debug')('kmjs:network:ws')
 const WS = require('./utils/websocket')
 const EventEmitter = require('eventemitter2')
 const km = require('./keymetrics')
 
 module.exports = class NetworkWrapper {
   constructor (opts) {
+    logger('init network manager')
     opts.baseURL = opts.API_URL || 'https://api.keymetrics.io'
     this.opts = opts
     this.tokens = {
@@ -20,7 +23,7 @@ module.exports = class NetworkWrapper {
     this._buckets = []
     this._queue = []
     this._axios = axios.create(opts)
-    this._queueWorker = setInterval(this.queueUpdater.bind(this), 100)
+    this._queueWorker = setInterval(this._queueUpdater.bind(this), 100)
     this._websockets = []
 
     this.realtime = new EventEmitter({
@@ -30,11 +33,16 @@ module.exports = class NetworkWrapper {
       maxListeners: 20
     })
     this.realtime.subscribe = this.subscribe.bind(this)
+    this.realtime.unsubscribe = this.unsubscribe.bind(this)
     this.authenticated = false
   }
 
-  queueUpdater () {
+  _queueUpdater () {
     if (this.authenticated === false) return
+
+    if (this._queue.length > 0) {
+      logger(`Emptying requests queue (size: ${this._queue.length})`)
+    }
 
     // when we are authenticated we can clear the queue
     while (this._queue.length > 0) {
@@ -44,6 +52,14 @@ module.exports = class NetworkWrapper {
     }
   }
 
+  /**
+   * Send a http request
+   * @param {Object} opts
+   * @param {String} [opts.method=GET] http method
+   * @param {String} opts.url the full URL
+   * @param {Object} [opts.data] body data
+   * @param {Object} [opts.params] url params
+   */
   request (httpOpts) {
     if (httpOpts.url.match(/bucket/)) {
       let bucketID = httpOpts.url.split('/')[3]
@@ -55,7 +71,7 @@ module.exports = class NetworkWrapper {
 
     return new Promise((resolve, reject) => {
       if (this.authenticated === false && httpOpts.authentication === true) {
-        logger(`Queued request to ${httpOpts.url}`)
+        loggerHttp(`Queued request to ${httpOpts.url}`)
         this._queue.push({
           resolve,
           reject,
@@ -68,10 +84,12 @@ module.exports = class NetworkWrapper {
   }
 
   /**
-   * Update the access token used by the http client
+   * Update the access token used by all the networking clients
+   * @param {Error} err if any erro
    * @param {String} accessToken the token you want to use
+   * @private
    */
-  updateTokens (err, data) {
+  _updateTokens (err, data) {
     if (err) {
       console.error(`Error while retrieving tokens : ${err.message}`)
       return console.error(err.response ? err.response.data : err.stack)
@@ -90,10 +108,18 @@ module.exports = class NetworkWrapper {
       })
   }
 
+  /**
+   * Specify a strategy to use when authenticating to server
+   * @param {String|Function} flow the name of the flow to use or a custom implementation
+   * @param {Object} [opts]
+   * @param {String} [opts.client_id] the OAuth client ID to use to identify the application
+   *  default to the one defined when instancing Keymetrics and fallback to 795984050 (custom tokens)
+   * @throws invalid use of this function, either the flow don't exist or isn't correctly implemented
+   */
   useStrategy (flow, opts) {
+    if (!opts) opts = {}
     // if client not provided here, use the one given in the instance
-    if (!opts || !opts.client_id) {
-      if (!opts) opts = {}
+    if (!opts.client_id) {
       opts.client_id = this.opts.OAUTH_CLIENT_ID
     }
 
@@ -116,27 +142,37 @@ module.exports = class NetworkWrapper {
     }
     let FlowImpl = flowMeta.nodule
     this.oauth_flow = new FlowImpl(opts)
-    return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this))
+    return this.oauth_flow.retrieveTokens(this._updateTokens.bind(this))
   }
 
+  /**
+   * Subscribe to realtime from bucket
+   * @param {String} bucketId bucket id
+   * @param {Object} [opts]
+   *
+   * @return {Promise}
+   */
   subscribe (bucketId, opts) {
     return new Promise((resolve, reject) => {
+      logger(`Request endpoints for ${bucketId}`)
       km.bucket.retrieve(bucketId)
         .then((res) => {
           let bucket = res.data
 
-          let endpoint = bucket.node_cache.endpoints.web
+          let endpoint = bucket.node_cache.endpoints.realtime || bucket.node_cache.endpoints.web
+          endpoint = endpoint.replace('http', 'ws')
           if (this.opts.IS_DEBUG) {
             endpoint = endpoint.replace(':3000', ':4020')
           }
-          endpoint = endpoint.replace('http', 'ws')
+          loggerWS(`Found endpoint for ${bucketId} : ${endpoint}`)
 
-          // connect primus to a bucket
+          // connect websocket client to the realtime endpoint
           let socket = new WS(`${endpoint}/primus/?token=${this.tokens.access_token}`)
           socket.connected = false
           socket.bucket = bucketId
 
           let onConnect = () => {
+            logger(`Connected to ws endpoint : ${endpoint} (bucket: ${bucketId})`)
             socket.connected = true
             this.realtime.emit(`${bucket.public_id}:connected`)
 
@@ -149,20 +185,26 @@ module.exports = class NetworkWrapper {
           socket.onreconnect = onConnect
 
           socket.onerror = (err) => {
+            loggerWS(`Error on ${endpoint} (bucket: ${bucketId})`)
+            loggerWS(err)
+
             this.realtime.emit(`${bucket.public_id}:error`, err)
           }
 
           socket.onclose = () => {
+            logger(`Closing ws connection ${endpoint} (bucket: ${bucketId})`)
             socket.connected = false
             this.realtime.emit(`${bucket.public_id}:disconnected`)
           }
 
           // broadcast in the bus
           socket.onmessage = (data) => {
-            data = JSON.parse(data.data).data[1]
-            Object.keys(data).forEach((event) => {
+            loggerWS(`Received message for bucket ${bucketId} (${(data.data.length / 1000).toFixed(1)} Kb)`)
+            data = JSON.parse(data.data)
+            let packet = data.data[1]
+            Object.keys(packet).forEach((event) => {
               if (event === 'server_name') return
-              this.realtime.emit(`${bucket.public_id}:${data.server_name || 'none'}:${event}`, data[event])
+              this.realtime.emit(`${bucket.public_id}:${data.server_name || 'none'}:${event}`, packet[event])
             })
           }
 
@@ -172,11 +214,23 @@ module.exports = class NetworkWrapper {
     })
   }
 
+  /**
+   * Unsubscribe realtime from bucket
+   * @param {String} bucketId bucket id
+   * @param {Object} [opts]
+   *
+   * @return {Promise}
+   */
   unsubscribe (bucketId, opts) {
-    opts = opts || {}
     return new Promise((resolve, reject) => {
-      let socket = this._websockets.find(socket => socket.bucketId === bucketId)
-      socket.end()
+      logger(`Unsubscribe from realtime for ${bucketId}`)
+      let socket = this._websockets.find(socket => socket.bucket === bucketId)
+      if (!socket) {
+        return reject(new Error(`Realtime wasn't connected to ${bucketId}`))
+      }
+      socket.close(1000, 'Disconnecting')
+      logger(`Succesfully unsubscribed from realtime for ${bucketId}`)
+      return resolve()
     })
   }
 }

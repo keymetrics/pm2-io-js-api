@@ -12,7 +12,9 @@ const Keymetrics = class Keymetrics {
  * @constructor
  * Keymetrics
  *
- * @param {object} opts The options are passed to the children instances
+ * @param {Object} [opts]
+ * @param {String} [opts.API_URL] the base URL to use
+ * @param {String} [opts.OAUTH_CLIENT_ID] the oauth client ID used to authenticate to KM
  */
   constructor (opts) {
     logger('init keymetrics instance')
@@ -42,7 +44,10 @@ const Keymetrics = class Keymetrics {
   /**
    * Use a specific flow to retrieve an access token on behalf the user
    * @param {String|Function} flow either a flow name or a custom implementation
-   * @param {Object} opts
+   * @param {Object} [opts]
+   * @param {String} [opts.client_id] the OAuth client ID to use to identify the application
+   *  default to the one defined when instancing Keymetrics and fallback to 795984050 (custom tokens)
+   * @throws invalid use of this function, either the flow don't exist or isn't correctly implemented
    */
   use (flow, opts) {
     logger(`using ${flow} authentication strategy`)

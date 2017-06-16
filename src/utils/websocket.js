@@ -3,7 +3,7 @@
 'use strict'
 
 const ws = require('ws')
-const debug = require('debug')('kmjs:ws')
+const debug = require('debug')('kmjs:network:_ws')
 
 const _WebSocket = typeof ws !== 'function' ? WebSocket : ws
 
@@ -101,7 +101,7 @@ ReconnectableWebSocket.prototype._onopen = function (event) {
 }
 
 ReconnectableWebSocket.prototype._onclose = function (event) {
-  debug('onclose')
+  debug('onclose', event)
   this._syncState()
   this._debug('WebSocket: connection is broken', event)
 
@@ -125,7 +125,7 @@ ReconnectableWebSocket.prototype._onerror = function (event) {
 
 ReconnectableWebSocket.prototype._tryReconnect = function (event) {
   var self = this
-
+  debug('Trying to reconnect')
   if (event.wasClean && !this._options.reconnectOnCleanClose) {
     return
   }
@@ -147,6 +147,7 @@ ReconnectableWebSocket.prototype._flushQueue = function () {
 ReconnectableWebSocket.prototype._getTimeout = function () {
   var timeout = this._options.reconnectInterval * Math.pow(this._options.reconnectDecay, this._reconnectAttempts)
   timeout = timeout > this._options.maxReconnectInterval ? this._options.maxReconnectInterval : timeout
+  console.log(timeout)
   return this._options.randomRatio ? getRandom(timeout / this._options.randomRatio, timeout) : timeout
 }
 
