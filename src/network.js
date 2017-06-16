@@ -6,7 +6,7 @@ const AuthStrategy = require('./auth_strategies/strategy')
 const constants = require('../constants')
 const logger = require('./utils/debug')('http')
 const WS = require('./utils/websocket')
-const EventEmitter = require('eventemitter3')
+const EventEmitter = require('eventemitter2')
 const km = require('./keymetrics')
 
 module.exports = class NetworkWrapper {

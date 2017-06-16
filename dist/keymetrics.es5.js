@@ -2,17 +2,22 @@
 (function (process){
 'use strict';
 
+var pkg = require('./package.json');
+
 var config = {
   API_URL: 'http://cl1.km.io:3000',
   OAUTH_AUTHORIZE_ENDPOINT: '/api/oauth/authorize',
   OAUTH_CLIENT_ID: 4228578805,
-  ENVIRONNEMENT: process && process.versions && process.versions.node ? 'node' : 'browser'
+  ENVIRONNEMENT: process && process.versions && process.versions.node ? 'node' : 'browser',
+  VERSION: pkg.version,
+  // put in debug when using km.io with browser OR when DEBUG=true with nodejs
+  IS_DEBUG: typeof window !== 'undefined' && window.location.host.match(/km.(io|local)/) || typeof process !== 'undefined' && process.env.DEBUG === 'true'
 };
 
 module.exports = Object.assign({}, config);
 
 }).call(this,require('_process'))
-},{"_process":28}],2:[function(require,module,exports){
+},{"./package.json":32,"_process":31}],2:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":4}],3:[function(require,module,exports){
 (function (process){
@@ -198,7 +203,7 @@ module.exports = function xhrAdapter(config) {
 };
 
 }).call(this,require('_process'))
-},{"../core/createError":10,"./../core/settle":13,"./../helpers/btoa":17,"./../helpers/buildURL":18,"./../helpers/cookies":20,"./../helpers/isURLSameOrigin":22,"./../helpers/parseHeaders":24,"./../utils":26,"_process":28}],4:[function(require,module,exports){
+},{"../core/createError":10,"./../core/settle":13,"./../helpers/btoa":17,"./../helpers/buildURL":18,"./../helpers/cookies":20,"./../helpers/isURLSameOrigin":22,"./../helpers/parseHeaders":24,"./../utils":26,"_process":31}],4:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
@@ -751,7 +756,7 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 module.exports = defaults;
 
 }).call(this,require('_process'))
-},{"./adapters/http":3,"./adapters/xhr":3,"./helpers/normalizeHeaderName":23,"./utils":26,"_process":28}],16:[function(require,module,exports){
+},{"./adapters/http":3,"./adapters/xhr":3,"./helpers/normalizeHeaderName":23,"./utils":26,"_process":31}],16:[function(require,module,exports){
 'use strict';
 
 module.exports = function bind(fn, thisArg) {
@@ -1416,7 +1421,462 @@ module.exports = {
   trim: trim
 };
 
-},{"./helpers/bind":16,"is-buffer":27}],27:[function(require,module,exports){
+},{"./helpers/bind":16,"is-buffer":30}],27:[function(require,module,exports){
+"use strict";
+
+},{}],28:[function(require,module,exports){
+
+/**
+ * Expose `debug()` as the module.
+ */
+
+module.exports = debug;
+
+/**
+ * Create a debugger with the given `name`.
+ *
+ * @param {String} name
+ * @return {Type}
+ * @api public
+ */
+
+function debug(name) {
+  if (!debug.enabled(name)) return function(){};
+
+  return function(fmt){
+    fmt = coerce(fmt);
+
+    var curr = new Date;
+    var ms = curr - (debug[name] || curr);
+    debug[name] = curr;
+
+    fmt = name
+      + ' '
+      + fmt
+      + ' +' + debug.humanize(ms);
+
+    // This hackery is required for IE8
+    // where `console.log` doesn't have 'apply'
+    window.console
+      && console.log
+      && Function.prototype.apply.call(console.log, console, arguments);
+  }
+}
+
+/**
+ * The currently active debug mode names.
+ */
+
+debug.names = [];
+debug.skips = [];
+
+/**
+ * Enables a debug mode by name. This can include modes
+ * separated by a colon and wildcards.
+ *
+ * @param {String} name
+ * @api public
+ */
+
+debug.enable = function(name) {
+  try {
+    localStorage.debug = name;
+  } catch(e){}
+
+  var split = (name || '').split(/[\s,]+/)
+    , len = split.length;
+
+  for (var i = 0; i < len; i++) {
+    name = split[i].replace('*', '.*?');
+    if (name[0] === '-') {
+      debug.skips.push(new RegExp('^' + name.substr(1) + '$'));
+    }
+    else {
+      debug.names.push(new RegExp('^' + name + '$'));
+    }
+  }
+};
+
+/**
+ * Disable debug output.
+ *
+ * @api public
+ */
+
+debug.disable = function(){
+  debug.enable('');
+};
+
+/**
+ * Humanize the given `ms`.
+ *
+ * @param {Number} m
+ * @return {String}
+ * @api private
+ */
+
+debug.humanize = function(ms) {
+  var sec = 1000
+    , min = 60 * 1000
+    , hour = 60 * min;
+
+  if (ms >= hour) return (ms / hour).toFixed(1) + 'h';
+  if (ms >= min) return (ms / min).toFixed(1) + 'm';
+  if (ms >= sec) return (ms / sec | 0) + 's';
+  return ms + 'ms';
+};
+
+/**
+ * Returns true if the given mode name is enabled, false otherwise.
+ *
+ * @param {String} name
+ * @return {Boolean}
+ * @api public
+ */
+
+debug.enabled = function(name) {
+  for (var i = 0, len = debug.skips.length; i < len; i++) {
+    if (debug.skips[i].test(name)) {
+      return false;
+    }
+  }
+  for (var i = 0, len = debug.names.length; i < len; i++) {
+    if (debug.names[i].test(name)) {
+      return true;
+    }
+  }
+  return false;
+};
+
+/**
+ * Coerce `val`.
+ */
+
+function coerce(val) {
+  if (val instanceof Error) return val.stack || val.message;
+  return val;
+}
+
+// persist
+
+try {
+  if (window.localStorage) debug.enable(localStorage.debug);
+} catch(e){}
+
+},{}],29:[function(require,module,exports){
+'use strict';
+
+var has = Object.prototype.hasOwnProperty
+  , prefix = '~';
+
+/**
+ * Constructor to create a storage for our `EE` objects.
+ * An `Events` instance is a plain object whose properties are event names.
+ *
+ * @constructor
+ * @api private
+ */
+function Events() {}
+
+//
+// We try to not inherit from `Object.prototype`. In some engines creating an
+// instance in this way is faster than calling `Object.create(null)` directly.
+// If `Object.create(null)` is not supported we prefix the event names with a
+// character to make sure that the built-in object properties are not
+// overridden or used as an attack vector.
+//
+if (Object.create) {
+  Events.prototype = Object.create(null);
+
+  //
+  // This hack is needed because the `__proto__` property is still inherited in
+  // some old browsers like Android 4, iPhone 5.1, Opera 11 and Safari 5.
+  //
+  if (!new Events().__proto__) prefix = false;
+}
+
+/**
+ * Representation of a single event listener.
+ *
+ * @param {Function} fn The listener function.
+ * @param {Mixed} context The context to invoke the listener with.
+ * @param {Boolean} [once=false] Specify if the listener is a one-time listener.
+ * @constructor
+ * @api private
+ */
+function EE(fn, context, once) {
+  this.fn = fn;
+  this.context = context;
+  this.once = once || false;
+}
+
+/**
+ * Minimal `EventEmitter` interface that is molded against the Node.js
+ * `EventEmitter` interface.
+ *
+ * @constructor
+ * @api public
+ */
+function EventEmitter() {
+  this._events = new Events();
+  this._eventsCount = 0;
+}
+
+/**
+ * Return an array listing the events for which the emitter has registered
+ * listeners.
+ *
+ * @returns {Array}
+ * @api public
+ */
+EventEmitter.prototype.eventNames = function eventNames() {
+  var names = []
+    , events
+    , name;
+
+  if (this._eventsCount === 0) return names;
+
+  for (name in (events = this._events)) {
+    if (has.call(events, name)) names.push(prefix ? name.slice(1) : name);
+  }
+
+  if (Object.getOwnPropertySymbols) {
+    return names.concat(Object.getOwnPropertySymbols(events));
+  }
+
+  return names;
+};
+
+/**
+ * Return the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Boolean} exists Only check if there are listeners.
+ * @returns {Array|Boolean}
+ * @api public
+ */
+EventEmitter.prototype.listeners = function listeners(event, exists) {
+  var evt = prefix ? prefix + event : event
+    , available = this._events[evt];
+
+  if (exists) return !!available;
+  if (!available) return [];
+  if (available.fn) return [available.fn];
+
+  for (var i = 0, l = available.length, ee = new Array(l); i < l; i++) {
+    ee[i] = available[i].fn;
+  }
+
+  return ee;
+};
+
+/**
+ * Calls each of the listeners registered for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @returns {Boolean} `true` if the event had listeners, else `false`.
+ * @api public
+ */
+EventEmitter.prototype.emit = function emit(event, a1, a2, a3, a4, a5) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return false;
+
+  var listeners = this._events[evt]
+    , len = arguments.length
+    , args
+    , i;
+
+  if (listeners.fn) {
+    if (listeners.once) this.removeListener(event, listeners.fn, undefined, true);
+
+    switch (len) {
+      case 1: return listeners.fn.call(listeners.context), true;
+      case 2: return listeners.fn.call(listeners.context, a1), true;
+      case 3: return listeners.fn.call(listeners.context, a1, a2), true;
+      case 4: return listeners.fn.call(listeners.context, a1, a2, a3), true;
+      case 5: return listeners.fn.call(listeners.context, a1, a2, a3, a4), true;
+      case 6: return listeners.fn.call(listeners.context, a1, a2, a3, a4, a5), true;
+    }
+
+    for (i = 1, args = new Array(len -1); i < len; i++) {
+      args[i - 1] = arguments[i];
+    }
+
+    listeners.fn.apply(listeners.context, args);
+  } else {
+    var length = listeners.length
+      , j;
+
+    for (i = 0; i < length; i++) {
+      if (listeners[i].once) this.removeListener(event, listeners[i].fn, undefined, true);
+
+      switch (len) {
+        case 1: listeners[i].fn.call(listeners[i].context); break;
+        case 2: listeners[i].fn.call(listeners[i].context, a1); break;
+        case 3: listeners[i].fn.call(listeners[i].context, a1, a2); break;
+        case 4: listeners[i].fn.call(listeners[i].context, a1, a2, a3); break;
+        default:
+          if (!args) for (j = 1, args = new Array(len -1); j < len; j++) {
+            args[j - 1] = arguments[j];
+          }
+
+          listeners[i].fn.apply(listeners[i].context, args);
+      }
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Add a listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.on = function on(event, fn, context) {
+  var listener = new EE(fn, context || this)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Add a one-time listener for a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn The listener function.
+ * @param {Mixed} [context=this] The context to invoke the listener with.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.once = function once(event, fn, context) {
+  var listener = new EE(fn, context || this, true)
+    , evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) this._events[evt] = listener, this._eventsCount++;
+  else if (!this._events[evt].fn) this._events[evt].push(listener);
+  else this._events[evt] = [this._events[evt], listener];
+
+  return this;
+};
+
+/**
+ * Remove the listeners of a given event.
+ *
+ * @param {String|Symbol} event The event name.
+ * @param {Function} fn Only remove the listeners that match this function.
+ * @param {Mixed} context Only remove the listeners that have this context.
+ * @param {Boolean} once Only remove one-time listeners.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeListener = function removeListener(event, fn, context, once) {
+  var evt = prefix ? prefix + event : event;
+
+  if (!this._events[evt]) return this;
+  if (!fn) {
+    if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+    return this;
+  }
+
+  var listeners = this._events[evt];
+
+  if (listeners.fn) {
+    if (
+         listeners.fn === fn
+      && (!once || listeners.once)
+      && (!context || listeners.context === context)
+    ) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    for (var i = 0, events = [], length = listeners.length; i < length; i++) {
+      if (
+           listeners[i].fn !== fn
+        || (once && !listeners[i].once)
+        || (context && listeners[i].context !== context)
+      ) {
+        events.push(listeners[i]);
+      }
+    }
+
+    //
+    // Reset the array, or remove it completely if we have no more listeners.
+    //
+    if (events.length) this._events[evt] = events.length === 1 ? events[0] : events;
+    else if (--this._eventsCount === 0) this._events = new Events();
+    else delete this._events[evt];
+  }
+
+  return this;
+};
+
+/**
+ * Remove all listeners, or those of the specified event.
+ *
+ * @param {String|Symbol} [event] The event name.
+ * @returns {EventEmitter} `this`.
+ * @api public
+ */
+EventEmitter.prototype.removeAllListeners = function removeAllListeners(event) {
+  var evt;
+
+  if (event) {
+    evt = prefix ? prefix + event : event;
+    if (this._events[evt]) {
+      if (--this._eventsCount === 0) this._events = new Events();
+      else delete this._events[evt];
+    }
+  } else {
+    this._events = new Events();
+    this._eventsCount = 0;
+  }
+
+  return this;
+};
+
+//
+// Alias methods names because people roll like that.
+//
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+EventEmitter.prototype.addListener = EventEmitter.prototype.on;
+
+//
+// This function doesn't apply anymore.
+//
+EventEmitter.prototype.setMaxListeners = function setMaxListeners() {
+  return this;
+};
+
+//
+// Expose the prefix.
+//
+EventEmitter.prefixed = prefix;
+
+//
+// Allow `EventEmitter` to be imported as module namespace.
+//
+EventEmitter.EventEmitter = EventEmitter;
+
+//
+// Expose the module.
+//
+if ('undefined' !== typeof module) {
+  module.exports = EventEmitter;
+}
+
+},{}],30:[function(require,module,exports){
 /*!
  * Determine if an object is a Buffer
  *
@@ -1439,7 +1899,7 @@ function isSlowBuffer (obj) {
   return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isBuffer(obj.slice(0, 0))
 }
 
-},{}],28:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -1625,7 +2085,78 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}],29:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
+module.exports={
+  "name": "keymetrics.js",
+  "version": "0.1.0",
+  "description": "Official Keymetrics API Client for Javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "exit 1",
+    "build": "browserify -s Keymetrics -r ./ > ./dist/keymetrics.es5.js",
+    "dist": "browserify -s Keymetrics -r ./ | uglifyjs -c warnings=false -m > ./dist/keymetrics.es5.min.js",
+    "doc": "jsdoc -r ./src --readme ./README.md -d doc -t ./node_modules/minami",
+    "clean": "rm dist/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keymetrics/km.js.git"
+  },
+  "keywords": [
+    "keymetrics",
+    "api",
+    "dashboard",
+    "monitoring",
+    "wrapper"
+  ],
+  "author": "Keymetrics Team",
+  "license": "Apache 2.0",
+  "bugs": {
+    "url": "https://github.com/keymetrics/km.js/issues"
+  },
+  "homepage": "https://github.com/keymetrics/km.js#readme",
+  "dependencies": {
+    "async": "^2.4.1",
+    "axios": "^0.16.2",
+    "eventemitter2": "^4.1.0",
+    "ws": "^3.0.0"
+  },
+  "devDependencies": {
+    "browserify": "^13.1.0",
+    "jsdoc": "^3.4.2",
+    "minami": "^1.1.1",
+    "mocha": "^3.0.2",
+    "uglify-js": "*",
+    "babel-preset-es2015": "*",
+    "babel-preset-stage-2": "*",
+    "babelify": "*"
+  },
+  "browserify": {
+    "debug": "true",
+    "transform": [
+      [
+        "babelify",
+        {
+          "presets": [
+            [
+              "babel-preset-es2015",
+              {
+                "debug": "true",
+                "sourceMaps": "true"
+              }
+            ]
+          ]
+        }
+      ]
+    ]
+  },
+  "browser": {
+    "./src/auth_strategies/embed_strategy.js": false,
+    "ws": false
+  }
+}
+
+},{}],33:[function(require,module,exports){
 module.exports={
     "data": {
         "status": [
@@ -5203,7 +5734,7 @@ module.exports={
         }
     ]
 }
-},{}],30:[function(require,module,exports){
+},{}],34:[function(require,module,exports){
 /* global URLSearchParams, URL, localStorage */
 'use strict';
 
@@ -5266,7 +5797,7 @@ module.exports = function (_AuthStrategy) {
   return BrowserFlow;
 }(AuthStrategy);
 
-},{"../keymetrics":35,"./strategy":32}],31:[function(require,module,exports){
+},{"../keymetrics":38,"./strategy":36}],35:[function(require,module,exports){
 
 'use strict';
 
@@ -5318,7 +5849,7 @@ module.exports = function (_AuthStrategy) {
   return StandaloneFlow;
 }(AuthStrategy);
 
-},{"../keymetrics":35,"./strategy":32}],32:[function(require,module,exports){
+},{"../keymetrics":38,"./strategy":36}],36:[function(require,module,exports){
 
 'use strict';
 
@@ -5374,7 +5905,7 @@ var AuthStrategy = function () {
 
 module.exports = AuthStrategy;
 
-},{"../../constants.js":1,"./browser_strategy":30,"./embed_strategy":30,"./standalone_strategy":31}],33:[function(require,module,exports){
+},{"../../constants.js":1,"./browser_strategy":34,"./embed_strategy":27,"./standalone_strategy":35}],37:[function(require,module,exports){
 
 'use strict';
 
@@ -5410,141 +5941,7 @@ module.exports = function () {
   return Endpoint;
 }();
 
-},{"./utils/validator":38}],34:[function(require,module,exports){
-
-'use strict';
-
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var axios = require('axios');
-var AuthStrategy = require('./auth_strategies/strategy');
-var constants = require('../constants');
-var logger = require('./utils/debug')('http');
-
-module.exports = function () {
-  function HttpWrapper(opts) {
-    _classCallCheck(this, HttpWrapper);
-
-    opts.baseURL = opts.API_URL || 'https://api.keymetrics.io';
-    this.opts = opts;
-    this.tokens = {
-      refresh_token: null,
-      access_token: null
-    };
-    this.buckets = [];
-    this.authenticated = false;
-    this.queue = [];
-    this._axios = axios.create(opts);
-    this._queueWorker = setInterval(this.queueUpdater.bind(this), 100);
-  }
-
-  _createClass(HttpWrapper, [{
-    key: 'queueUpdater',
-    value: function queueUpdater() {
-      if (this.authenticated === false) return;
-
-      // when we are authenticated we can clear the queue
-      while (this.queue.length > 0) {
-        var promise = this.queue.shift
-        // make the request
-        ();this.request(promise.request).then(promise.resolve, promise.reject);
-      }
-    }
-  }, {
-    key: 'request',
-    value: function request(httpOpts) {
-      var _this = this;
-
-      if (httpOpts.url.match(/bucket/)) {
-        var bucketID = httpOpts.url.split('/')[3];
-        var node = this.buckets.filter(function (bucket) {
-          return bucket._id === bucketID;
-        }).map(function (bucket) {
-          return bucket.node_cache;
-        })[0];
-        if (node && node.endpoints) {
-          httpOpts.baseURL = node.endpoints.web;
-        }
-      }
-
-      return new Promise(function (resolve, reject) {
-        if (_this.authenticated === false && httpOpts.authentication === true) {
-          logger('Queued request to ' + httpOpts.url);
-          _this.queue.push({
-            resolve: resolve,
-            reject: reject,
-            request: httpOpts
-          });
-        } else {
-          _this._axios.request(httpOpts).then(resolve, reject);
-        }
-      });
-    }
-
-    /**
-     * Update the access token used by the http client
-     * @param {String} accessToken the token you want to use
-     */
-
-  }, {
-    key: 'updateTokens',
-    value: function updateTokens(err, data) {
-      var _this2 = this;
-
-      if (err) {
-        console.error('Error while retrieving tokens : ' + err.message);
-        return console.error(err.response.data);
-      }
-      if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens');
-
-      this.tokens = data;
-      this._axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.access_token;
-      this._axios.request({ url: '/api/bucket', method: 'GET' }).then(function (res) {
-        _this2.buckets = res.data;
-        _this2.authenticated = true;
-      }).catch(function (err) {
-        console.error('Error while retrieving buckets');
-        console.error(err);
-      });
-    }
-  }, {
-    key: 'useStrategy',
-    value: function useStrategy(flow, opts) {
-      // if client not provided here, use the one given in the instance
-      if (!opts || !opts.client_id) {
-        if (!opts) opts = {};
-        opts.client_id = this.opts.OAUTH_CLIENT_ID;
-      }
-
-      // in the case of flow being a custom implementation
-      if (typeof flow === 'function') {
-        if (!(flow instanceof AuthStrategy)) throw new Error('You must implement the Flow interface to use it');
-        var CustomFlow = flow;
-        this.oauth_flow = new CustomFlow(opts);
-        return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this));
-      }
-      // otherwise fallback on the flow that are implemented
-      if (typeof AuthStrategy.implementations(flow) === 'undefined') {
-        throw new Error('The flow named ' + flow + ' doesn\'t exist');
-      }
-      var flowMeta = AuthStrategy.implementations(flow
-
-      // verify that the environnement condition is meet
-      );if (flowMeta.condition && constants.ENVIRONNEMENT !== flowMeta.condition) {
-        throw new Error('The flow ' + flow + ' is reserved for ' + flowMeta.condition + ' environ sment');
-      }
-      var FlowImpl = flowMeta.nodule;
-      this.oauth_flow = new FlowImpl(opts);
-      return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this));
-    }
-  }]);
-
-  return HttpWrapper;
-}();
-
-},{"../constants":1,"./auth_strategies/strategy":32,"./utils/debug":37,"axios":2}],35:[function(require,module,exports){
+},{"./utils/validator":42}],38:[function(require,module,exports){
 
 'use strict';
 
@@ -5554,8 +5951,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var mapping = require('./api_mappings.json');
 var Namespace = require('./namespace');
-var HttpWrapper = require('./http');
 var constants = require('../constants');
+var NetworkWrapper = require('./network');
 var logger = require('./utils/debug')();
 
 var Keymetrics = function () {
@@ -5571,24 +5968,25 @@ var Keymetrics = function () {
     logger('init keymetrics instance');
     this.opts = Object.assign(constants, opts);
 
-    this.version = 1;
-
-    logger('init http client');
-    this.http = new HttpWrapper(this.opts);
+    logger('init network client (http/ws)');
+    this._network = new NetworkWrapper(this.opts);
 
     // build namespaces at startup
     logger('building namespaces');
     var root = new Namespace(mapping, {
       name: 'root',
-      http: this.http
+      http: this._network
     });
     logger('exposing namespaces');
     for (var key in root) {
       if (key === 'name' || key === 'opts') continue;
       this[key] = root[key];
       Keymetrics[key] = root[key];
+      exports[key] = root[key];
     }
     logger('attached namespaces : ' + Object.keys(this));
+
+    this.realtime = this._network.realtime;
   }
 
   /**
@@ -5602,7 +6000,7 @@ var Keymetrics = function () {
     key: 'use',
     value: function use(flow, opts) {
       logger('using ' + flow + ' authentication strategy');
-      this.http.useStrategy(flow, opts);
+      this._network.useStrategy(flow, opts);
       return this;
     }
   }]);
@@ -5612,7 +6010,7 @@ var Keymetrics = function () {
 
 module.exports = Keymetrics;
 
-},{"../constants":1,"./api_mappings.json":29,"./http":34,"./namespace":36,"./utils/debug":37}],36:[function(require,module,exports){
+},{"../constants":1,"./api_mappings.json":33,"./namespace":39,"./network":40,"./utils/debug":41}],39:[function(require,module,exports){
 
 'use strict';
 
@@ -5693,7 +6091,219 @@ module.exports = function () {
   return Namespace;
 }();
 
-},{"./endpoint":33,"./utils/debug":37}],37:[function(require,module,exports){
+},{"./endpoint":37,"./utils/debug":41}],40:[function(require,module,exports){
+
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var axios = require('axios');
+var AuthStrategy = require('./auth_strategies/strategy');
+var constants = require('../constants');
+var logger = require('./utils/debug')('http');
+var WS = require('./utils/websocket');
+var EventEmitter = require('eventemitter3');
+var km = require('./keymetrics');
+
+module.exports = function () {
+  function NetworkWrapper(opts) {
+    _classCallCheck(this, NetworkWrapper);
+
+    opts.baseURL = opts.API_URL || 'https://api.keymetrics.io';
+    this.opts = opts;
+    this.tokens = {
+      refresh_token: null,
+      access_token: null
+    };
+    this._buckets = [];
+    this._queue = [];
+    this._axios = axios.create(opts);
+    this._queueWorker = setInterval(this.queueUpdater.bind(this), 100);
+    this._websockets = [];
+
+    this.realtime = new EventEmitter({
+      wildcard: true,
+      delimiter: ':',
+      newListener: false,
+      maxListeners: 20
+    });
+    this.realtime.subscribe = this.subscribe.bind(this);
+    this.authenticated = false;
+  }
+
+  _createClass(NetworkWrapper, [{
+    key: 'queueUpdater',
+    value: function queueUpdater() {
+      if (this.authenticated === false) return;
+
+      // when we are authenticated we can clear the queue
+      while (this._queue.length > 0) {
+        var promise = this._queue.shift
+        // make the request
+        ();this.request(promise.request).then(promise.resolve, promise.reject);
+      }
+    }
+  }, {
+    key: 'request',
+    value: function request(httpOpts) {
+      var _this = this;
+
+      if (httpOpts.url.match(/bucket/)) {
+        var bucketID = httpOpts.url.split('/')[3];
+        var node = this._buckets.filter(function (bucket) {
+          return bucket._id === bucketID;
+        }).map(function (bucket) {
+          return bucket.node_cache;
+        })[0];
+        if (node && node.endpoints) {
+          httpOpts.baseURL = node.endpoints.web;
+        }
+      }
+
+      return new Promise(function (resolve, reject) {
+        if (_this.authenticated === false && httpOpts.authentication === true) {
+          logger('Queued request to ' + httpOpts.url);
+          _this._queue.push({
+            resolve: resolve,
+            reject: reject,
+            request: httpOpts
+          });
+        } else {
+          _this._axios.request(httpOpts).then(resolve).catch(reject);
+        }
+      });
+    }
+
+    /**
+     * Update the access token used by the http client
+     * @param {String} accessToken the token you want to use
+     */
+
+  }, {
+    key: 'updateTokens',
+    value: function updateTokens(err, data) {
+      var _this2 = this;
+
+      if (err) {
+        console.error('Error while retrieving tokens : ' + err.message);
+        return console.error(err.response ? err.response.data : err.stack);
+      }
+      if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens');
+
+      this.tokens = data;
+      this._axios.defaults.headers.common['Authorization'] = 'Bearer ' + data.access_token;
+      this._axios.request({ url: '/api/bucket', method: 'GET' }).then(function (res) {
+        _this2._buckets = res.data;
+        _this2.authenticated = true;
+      }).catch(function (err) {
+        console.error('Error while retrieving buckets');
+        console.error(err.response ? err.response.data : err);
+      });
+    }
+  }, {
+    key: 'useStrategy',
+    value: function useStrategy(flow, opts) {
+      // if client not provided here, use the one given in the instance
+      if (!opts || !opts.client_id) {
+        if (!opts) opts = {};
+        opts.client_id = this.opts.OAUTH_CLIENT_ID;
+      }
+
+      // in the case of flow being a custom implementation
+      if (typeof flow === 'function') {
+        if (!(flow instanceof AuthStrategy)) throw new Error('You must implement the Flow interface to use it');
+        var CustomFlow = flow;
+        this.oauth_flow = new CustomFlow(opts);
+        return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this));
+      }
+      // otherwise fallback on the flow that are implemented
+      if (typeof AuthStrategy.implementations(flow) === 'undefined') {
+        throw new Error('The flow named ' + flow + ' doesn\'t exist');
+      }
+      var flowMeta = AuthStrategy.implementations(flow
+
+      // verify that the environnement condition is meet
+      );if (flowMeta.condition && constants.ENVIRONNEMENT !== flowMeta.condition) {
+        throw new Error('The flow ' + flow + ' is reserved for ' + flowMeta.condition + ' environ sment');
+      }
+      var FlowImpl = flowMeta.nodule;
+      this.oauth_flow = new FlowImpl(opts);
+      return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this));
+    }
+  }, {
+    key: 'subscribe',
+    value: function subscribe(bucketId, opts, cb) {
+      var _this3 = this;
+
+      if (typeof opts === 'function') {
+        cb = opts;
+        opts = {};
+      }
+
+      if (this.authenticated === false) {
+        return cb(new Error('You can subscribe while being unauthenticated'));
+      }
+
+      km.bucket.retrieve(bucketId).then(function (res) {
+        var bucket = res.data;
+
+        var endpoint = bucket.node_cache.endpoints.web;
+        if (_this3.opts.IS_DEBUG) {
+          endpoint = endpoint.replace(':3000', ':4020');
+        }
+
+        // connect primus to a bucket
+        var socket = new WS(endpoint + '/primus/?token=' + _this3.tokens.access_token);
+        socket.connected = false;
+        socket.bucket = bucketId;
+
+        var onConnect = function onConnect() {
+          socket.connected = true;
+          _this3.realtime.emit(bucket.public_id + ':connected');
+
+          socket.send(JSON.stringify({
+            action: 'active',
+            public_id: bucket.public_id
+          }));
+        };
+        socket.onopen = onConnect;
+        socket.onreconnect = onConnect;
+
+        socket.onerror = function (err) {
+          _this3.realtime.emit(bucket.public_id + ':error', err);
+        };
+
+        socket.onclose = function () {
+          socket.connected = false;
+          _this3.realtime.emit(bucket.public_id + ':disconnected');
+        };
+
+        // broadcast in the bus
+        socket.onmessage = function (data) {
+          data = JSON.parse(data.data).data[1];
+          Object.keys(data).forEach(function (event) {
+            if (event === 'server_name') return;
+            _this3.realtime.emit(bucket.public_id + ':' + (data.server_name || 'none') + ':' + event, data[event]);
+          });
+        };
+
+        _this3._websockets.push(socket);
+      }).catch(function (err) {
+        if (err.response) {
+          return cb(new Error(err.response.data.msg));
+        } else {
+          return cb(err);
+        }
+      });
+    }
+  }]);
+
+  return NetworkWrapper;
+}();
+
+},{"../constants":1,"./auth_strategies/strategy":36,"./keymetrics":38,"./utils/debug":41,"./utils/websocket":43,"axios":2,"eventemitter3":29}],41:[function(require,module,exports){
 (function (process,global){
 
 'use strict';
@@ -5711,7 +6321,7 @@ module.exports = function (namespace) {
 };
 
 }).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
-},{"_process":28}],38:[function(require,module,exports){
+},{"_process":31}],42:[function(require,module,exports){
 
 'use strict';
 
@@ -5975,10 +6585,173 @@ module.exports = function () {
   return RequestValidator;
 }();
 
-},{}],"/":[function(require,module,exports){
+},{}],43:[function(require,module,exports){
+/* global WebSocket */
+
+'use strict';
+
+var ws = require('ws');
+var debug = require('debug')('ws-bus');
+
+var _WebSocket = typeof ws !== 'function' ? WebSocket : ws;
+
+var defaultOptions = {
+  debug: false,
+  automaticOpen: true,
+  reconnectOnError: true,
+  reconnectInterval: 1000,
+  maxReconnectInterval: 30000,
+  reconnectDecay: 1,
+  timeoutInterval: 2000,
+  maxReconnectAttempts: null,
+  randomRatio: 3,
+  reconnectOnCleanClose: false
+};
+
+var ReconnectableWebSocket = function ReconnectableWebSocket(url, protocols, options) {
+  if (!protocols) protocols = [];
+  if (!options) options = [];
+
+  this.CONNECTING = 0;
+  this.OPEN = 1;
+  this.CLOSING = 2;
+  this.CLOSED = 3;
+
+  this._url = url;
+  this._protocols = protocols;
+  this._options = Object.assign({}, defaultOptions, options);
+  this._messageQueue = [];
+  this._reconnectAttempts = 0;
+  this.readyState = this.CONNECTING;
+
+  if (typeof this._options.debug === 'function') {
+    this._debug = this._options.debug;
+  } else if (this._options.debug) {
+    this._debug = console.log.bind(console);
+  } else {
+    this._debug = function () {};
+  }
+
+  if (this._options.automaticOpen) this.open();
+};
+
+ReconnectableWebSocket.prototype.open = function () {
+  debug('open');
+  var socket = this._socket = new _WebSocket(this._url, this._protocols);
+
+  if (this._options.binaryType) {
+    socket.binaryType = this._options.binaryType;
+  }
+
+  if (this._options.maxReconnectAttempts && this._options.maxReconnectAttempts < this._reconnectAttempts) {
+    return;
+  }
+
+  this._syncState();
+
+  socket.onmessage = this._onmessage.bind(this);
+  socket.onopen = this._onopen.bind(this);
+  socket.onclose = this._onclose.bind(this);
+  socket.onerror = this._onerror.bind(this);
+};
+
+ReconnectableWebSocket.prototype.send = function (data) {
+  debug('send');
+  if (this._socket && this._socket.readyState === _WebSocket.OPEN && this._messageQueue.length === 0) {
+    this._socket.send(data);
+  } else {
+    this._messageQueue.push(data);
+  }
+};
+
+ReconnectableWebSocket.prototype.close = function (code, reason) {
+  debug('close');
+  if (typeof code === 'undefined') code = 1000;
+
+  if (this._socket) this._socket.close(code, reason);
+};
+
+ReconnectableWebSocket.prototype._onmessage = function (message) {
+  debug('onmessage');
+  this.onmessage && this.onmessage(message);
+};
+
+ReconnectableWebSocket.prototype._onopen = function (event) {
+  debug('onopen');
+  this._syncState();
+  this._flushQueue();
+  if (this._reconnectAttempts !== 0) {
+    this.onreconnect && this.onreconnect();
+  }
+  this._reconnectAttempts = 0;
+
+  this.onopen && this.onopen(event);
+};
+
+ReconnectableWebSocket.prototype._onclose = function (event) {
+  debug('onclose');
+  this._syncState();
+  this._debug('WebSocket: connection is broken', event);
+
+  this.onclose && this.onclose(event);
+
+  this._tryReconnect(event);
+};
+
+ReconnectableWebSocket.prototype._onerror = function (event) {
+  debug('onerror', event
+  // To avoid undetermined state, we close socket on error
+  );this._socket.close();
+  this._syncState();
+
+  this._debug('WebSocket: error', event);
+
+  this.onerror && this.onerror(event);
+
+  if (this._options.reconnectOnError) this._tryReconnect(event);
+};
+
+ReconnectableWebSocket.prototype._tryReconnect = function (event) {
+  var self = this;
+
+  if (event.wasClean && !this._options.reconnectOnCleanClose) {
+    return;
+  }
+  setTimeout(function () {
+    if (self.readyState === self.CLOSING || self.readyState === self.CLOSED) {
+      self._reconnectAttempts++;
+      self.open();
+    }
+  }, this._getTimeout());
+};
+
+ReconnectableWebSocket.prototype._flushQueue = function () {
+  while (this._messageQueue.length !== 0) {
+    var data = this._messageQueue.shift();
+    this._socket.send(data);
+  }
+};
+
+ReconnectableWebSocket.prototype._getTimeout = function () {
+  var timeout = this._options.reconnectInterval * Math.pow(this._options.reconnectDecay, this._reconnectAttempts);
+  timeout = timeout > this._options.maxReconnectInterval ? this._options.maxReconnectInterval : timeout;
+  return this._options.randomRatio ? getRandom(timeout / this._options.randomRatio, timeout) : timeout;
+};
+
+ReconnectableWebSocket.prototype._syncState = function () {
+  this.readyState = this._socket.readyState;
+};
+
+function getRandom(min, max) {
+  return Math.random() * (max - min) + min;
+}
+
+module.exports = ReconnectableWebSocket;
+
+},{"debug":28,"ws":27}],"/":[function(require,module,exports){
 'use strict';
 
 module.exports = require('./src/keymetrics.js');
 
-},{"./src/keymetrics.js":35}]},{},[])("/")
+},{"./src/keymetrics.js":38}]},{},[])("/")
 });

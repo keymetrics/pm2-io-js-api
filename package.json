@@ -63,6 +63,7 @@
     ]
   },
   "browser": {
-    "./src/auth_strategies/embed_strategy.js": "./src/auth_strategies/browser_strategy.js"
+    "./src/auth_strategies/embed_strategy.js": false,
+    "ws": false
   }
 }
