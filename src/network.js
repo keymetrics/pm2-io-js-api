@@ -171,6 +171,11 @@ module.exports = class NetworkWrapper {
           socket.connected = false
           socket.bucket = bucketId
 
+          let keepAliveHandler = function () {
+            socket.send(`primus::pong::${Date.now()}`)
+          }
+          let keepAliveInterval = null
+
           let onConnect = () => {
             logger(`Connected to ws endpoint : ${endpoint} (bucket: ${bucketId})`)
             socket.connected = true
@@ -180,6 +185,12 @@ module.exports = class NetworkWrapper {
               action: 'active',
               public_id: bucket.public_id
             }))
+
+            if (keepAliveInterval !== null) {
+              clearInterval(keepAliveInterval)
+              keepAliveInterval = null
+            }
+            keepAliveInterval = setInterval(keepAliveHandler.bind(this), 5000)
           }
           socket.onopen = onConnect
           socket.onreconnect = onConnect
@@ -195,12 +206,17 @@ module.exports = class NetworkWrapper {
             logger(`Closing ws connection ${endpoint} (bucket: ${bucketId})`)
             socket.connected = false
             this.realtime.emit(`${bucket.public_id}:disconnected`)
+
+            if (keepAliveInterval !== null) {
+              clearInterval(keepAliveInterval)
+              keepAliveInterval = null
+            }
           }
 
           // broadcast in the bus
-          socket.onmessage = (data) => {
-            loggerWS(`Received message for bucket ${bucketId} (${(data.data.length / 1000).toFixed(1)} Kb)`)
-            data = JSON.parse(data.data)
+          socket.onmessage = (msg) => {
+            loggerWS(`Received message for bucket ${bucketId} (${(msg.data.length / 1000).toFixed(1)} Kb)`)
+            let data = JSON.parse(msg.data)
             let packet = data.data[1]
             Object.keys(packet).forEach((event) => {
               if (event === 'server_name') return
