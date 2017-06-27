@@ -12,15 +12,15 @@ $ npm install keymetrics.js --save
 
 ## Usage
 
-To use this client you need to first requiring it into your code and creating a new instance : 
+To use this client you need to first requiring it into your code and creating a new instance :
 
 ```javascript
-const Keymetrics = require('kmjs')
+const Keymetrics = require('keymetrics.js')
 
 let km = new Keymetrics()
 ```
 
-Then you'll to tell the client how you want to authenticate, you have the choice : 
+Then you'll to tell the client how you want to authenticate, you have the choice :
 
 - First the `standalone` flow, you just need to enter a refresh token and it will works
 ```javascript
@@ -29,14 +29,14 @@ km.use('standalone', {
 })
 ```
 
-- Secondly, the `browser` flow, you have a custom keymetrics application and you want to authenticate of the behalf for any user (in this flow you need to be inside a browser) : 
+- Secondly, the `browser` flow, you have a custom keymetrics application and you want to authenticate of the behalf for any user (in this flow you need to be inside a browser) :
 ```javascript
 km.use('browser', {
   client_id: 'my-oauth-client-id'
 })
 ```
 
-- Thirdly, the `embed` flow, you have a custom keymetrics application and you want to authenticate of the behalf of any user (you need to be in a nodejs process, for example a CLI) : 
+- Thirdly, the `embed` flow, you have a custom keymetrics application and you want to authenticate of the behalf of any user (you need to be in a nodejs process, for example a CLI) :
 ```javascript
 km.use('embed', {
   client_id: 'my-oauth-client-id'
@@ -76,7 +76,7 @@ km.bucket.retrieveAll()
     // attach handler on specific realtime data
     km.realtime.on(`${bucket.public_id}:connected`, () => console.log('connected to realtime'))
     km.realtime.on(`${bucket.public_id}:*:status`, (data) => console.log(data.server_name))
- 
+
     // we can also unsubscribe from a bucket realtime data
     setTimeout(() => {
       km.realtime.unsubscribe(bucket._id).catch(console.error)
@@ -87,7 +87,7 @@ km.bucket.retrieveAll()
 
 ### Realtime
 
-All realtime data are broadcasted with the following pattern : 
+All realtime data are broadcasted with the following pattern :
 
 ```
 bucket_public_id:server_name:data_method
@@ -96,7 +96,7 @@ bucket_public_id:server_name:data_method
 For example :
 
 ```javascript
-// here i listen on the status data for 
+// here i listen on the status data for
 // the server "my_server" on the bucket with
 // the public id 4398545
 km.realtime.on(`4398545:my_server:status`, (data) => {

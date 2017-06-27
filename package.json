@@ -3,8 +3,11 @@
   "version": "0.1.0",
   "description": "Official Keymetrics API Client for Javascript",
   "main": "index.js",
+  "engines": {
+    "node": ">=8.0"
+  },
   "scripts": {
-    "test": "exit 1",
+    "test": "mocha test/*",
     "build": "browserify -s Keymetrics -r ./ > ./dist/keymetrics.es5.js",
     "dist": "browserify -s Keymetrics -r ./ | uglifyjs -c warnings=false -m > ./dist/keymetrics.es5.min.js",
     "doc": "jsdoc -r ./src --readme ./README.md -d doc -t ./node_modules/minami",
@@ -36,13 +39,15 @@
   },
   "devDependencies": {
     "browserify": "^13.1.0",
+    "pm2" : "latest",
     "jsdoc": "^3.4.2",
     "minami": "^1.1.1",
     "mocha": "^3.0.2",
     "uglify-js": "*",
     "babel-preset-es2015": "*",
     "babel-preset-stage-2": "*",
-    "babelify": "*"
+    "babelify": "*",
+    "should" : "*"
   },
   "browserify": {
     "debug": "true",
