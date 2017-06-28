@@ -64,7 +64,7 @@ module.exports = class RequestValidator {
               return reject(new Error(`Missing mandatory field ${field.name} to make a POST request on ${endpoint.route.name}`))
             }
             // verify that the mandatory field are the good type
-            if (typeof data[field.name] !== field.type && field.optional === false && field.defaultvalue === null) {
+            if (typeof data[field.name] !== field.type && field.optional === false && field.defaultvalue === null) { // eslint-disable-line 
               return reject(new Error(`Invalid type for field ${field.name}, expected ${field.type} but got ${typeof data[field.name]}`))
             }
 

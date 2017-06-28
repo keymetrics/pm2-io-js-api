@@ -38,16 +38,17 @@
     "ws": "^3.0.0"
   },
   "devDependencies": {
-    "browserify": "^13.1.0",
-    "pm2" : "latest",
-    "jsdoc": "^3.4.2",
-    "minami": "^1.1.1",
-    "mocha": "^3.0.2",
-    "uglify-js": "*",
     "babel-preset-es2015": "*",
     "babel-preset-stage-2": "*",
     "babelify": "*",
-    "should" : "*"
+    "browserify": "^13.1.0",
+    "jsdoc": "^3.4.2",
+    "minami": "^1.1.1",
+    "mocha": "^3.0.2",
+    "pm2": "latest",
+    "should": "*",
+    "standard": "^10.0.2",
+    "uglify-js": "*"
   },
   "browserify": {
     "debug": "true",
@@ -71,5 +72,12 @@
   "browser": {
     "./src/auth_strategies/embed_strategy.js": false,
     "ws": false
+  },
+  "standard": {
+    "ignore": [
+      "dist/**",
+      "examples/**",
+      "test/**"
+    ]
   }
 }
