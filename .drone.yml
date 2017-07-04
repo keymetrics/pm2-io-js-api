@@ -4,6 +4,7 @@ pipeline:
     commands:
       - npm install 2> /dev/null
       - export NODE_ENV=test
+      - env
       - npm run test
       - ./node_modules/.bin/standard
   slack:
