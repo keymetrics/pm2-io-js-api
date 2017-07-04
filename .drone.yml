@@ -4,9 +4,9 @@ pipeline:
     commands:
       - npm install 2> /dev/null
       - export NODE_ENV=test
-      - env
       - npm run test
       - ./node_modules/.bin/standard
+    secrets: [ keymetrics_token ]
   slack:
     image: plugins/slack
     channel: ci
