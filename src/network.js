@@ -95,6 +95,12 @@ module.exports = class NetworkWrapper {
       return console.error(err.response ? err.response.data : err.stack)
     }
     if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens')
+    
+    // Tokens are valid, remove them from url without redirect
+    const params = `?access_token=${data.refresh_token}&token_type=refresh_token`
+    const url = window.location.href
+    const newUrl = url.replace(params, '')
+    window.history.pushState('','', newUrl)
 
     this.tokens = data
     this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
