@@ -1,10 +1,10 @@
 {
-  "name": "keymetrics.js",
-  "version": "0.1.0",
+  "name": "kmjs-core",
+  "version": "0.2.0",
   "description": "Official Keymetrics API Client for Javascript",
   "main": "index.js",
   "engines": {
-    "node": ">=8.0"
+    "node": ">=4.0"
   },
   "scripts": {
     "test": "mocha test/*",
