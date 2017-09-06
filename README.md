@@ -7,7 +7,7 @@ This module lets you implement a fully customizable Keymetrics client, receiving
 With NPM:
 
 ```bash
-$ npm install keymetrics.js --save
+$ npm install kmjs-core --save
 ```
 
 ## Usage
@@ -15,7 +15,7 @@ $ npm install keymetrics.js --save
 To use this client you need to first requiring it into your code and creating a new instance :
 
 ```javascript
-const Keymetrics = require('keymetrics.js')
+const Keymetrics = require('kmjs-core')
 
 let km = new Keymetrics()
 ```
