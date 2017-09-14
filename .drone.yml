@@ -5,7 +5,6 @@ pipeline:
       - npm install 2> /dev/null
       - export NODE_ENV=test
       - npm run test
-      - ./node_modules/.bin/standard
     secrets: [ keymetrics_token ]
   slack:
     image: plugins/slack
@@ -20,6 +19,10 @@ pipeline:
       {{/success}}
       see {{ build.link }}
     secrets: [ slack_webhook ]
+  linter:
+    image: node:8
+    commands:
+      - ./node_modules/.bin/standard
 matrix:
   NODE_VERSION:
     - 4
