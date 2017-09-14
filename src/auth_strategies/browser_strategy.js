@@ -31,12 +31,14 @@ module.exports = class BrowserFlow extends AuthStrategy {
       verifyToken(params.get('access_token'))
         .then((res) => {
           this.removeUrlToken(res.data.refresh_token)
+          // Save refreshToken in localstorage
+          localStorage.setItem('km_refresh_token', params.get('access_token'))
           let tokens = res.data
           return cb(null, tokens)
         }).catch(cb)
-    } else if (typeof localStorage !== 'undefined' && localStorage.getItem('refresh_token') !== null) {
+    } else if (typeof localStorage !== 'undefined' && localStorage.getItem('km_refresh_token') !== null) {
       // maybe in the local storage ?
-      verifyToken(localStorage.getItem('refresh_token'))
+      verifyToken(localStorage.getItem('km_refresh_token'))
         .then((res) => {
           this.removeUrlToken(res.data.refresh_token)
           let tokens = res.data
