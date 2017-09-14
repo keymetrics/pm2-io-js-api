@@ -5,8 +5,7 @@ const AuthStrategy = require('./strategy')
 const km = require('../keymetrics')
 
 module.exports = class BrowserFlow extends AuthStrategy {
-
-  removeUrlToken(refreshToken) {
+  removeUrlToken (refreshToken) {
     let url = window.location.href
     let params = `?access_token=${refreshToken}&token_type=refresh_token`
     let newUrl = url.replace(params, '')
@@ -25,7 +24,7 @@ module.exports = class BrowserFlow extends AuthStrategy {
     let url = new URL(window.location)
     this.response_mode = this.response_mode === 'query' ? 'search' : this.response_mode
     let params = new URLSearchParams(url[this.response_mode])
-    
+
     if (params.get('access_token') !== null) {
       // verify that the access_token in parameters is valid
       verifyToken(params.get('access_token'))
@@ -49,5 +48,4 @@ module.exports = class BrowserFlow extends AuthStrategy {
       window.location = `${this.oauth_endpoint}${this.oauth_query}`
     }
   }
-
 }

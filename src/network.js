@@ -95,7 +95,7 @@ module.exports = class NetworkWrapper {
       return console.error(err.response ? err.response.data : err.stack)
     }
     if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens')
-    
+
     this.tokens = data
     this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
     this._axios.request({ url: '/api/bucket', method: 'GET' })
