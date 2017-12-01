@@ -26,15 +26,15 @@ module.exports = class RequestValidator {
           for (let param of (endpoint.params || [])) {
             let value = args.shift()
             // params should always be a string since they will be replaced in the url
-            if (typeof value !== 'string') {
+            if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} to match but got ${value}`))
             }
             httpOpts.url = httpOpts.url.replace(param.name, value)
           }
           for (let param of (endpoint.query || [])) {
             let value = args.shift()
-            // query should always be a string
-            if (typeof value !== 'string') {
+            // query should always be a string since they will be replaced in the url
+            if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} query but got ${value}`))
             }
             httpOpts.params[param.name] = value

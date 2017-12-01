@@ -1,7 +1,6 @@
 
 'use strict'
 
-const mapping = require('./api_mappings.json')
 const Namespace = require('./namespace')
 const constants = require('../constants')
 const NetworkWrapper = require('./network')
@@ -15,6 +14,7 @@ const Keymetrics = class Keymetrics {
  * @param {Object} [opts]
  * @param {String} [opts.API_URL] the base URL to use
  * @param {String} [opts.OAUTH_CLIENT_ID] the oauth client ID used to authenticate to KM
+ * @param {String} [opts.mappings] api mappings
  */
   constructor (opts) {
     logger('init keymetrics instance')
@@ -22,6 +22,9 @@ const Keymetrics = class Keymetrics {
 
     logger('init network client (http/ws)')
     this._network = new NetworkWrapper(this.opts)
+
+    const mapping = opts && opts.mappings ? opts.mappings : require('./api_mappings.json')
+    logger(`Using mappings provided in ${opts && opts.mappings ? 'options' : 'package'}`)
 
     // build namespaces at startup
     logger('building namespaces')
