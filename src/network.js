@@ -78,7 +78,36 @@ module.exports = class NetworkWrapper {
           request: httpOpts
         })
       } else {
-        this._axios.request(httpOpts).then(resolve).catch(reject)
+        loggerHttp(`Making request to ${httpOpts.url}`)
+        this._axios.request(httpOpts)
+          .then(resolve)
+          .catch((error) => {
+            let response = error.response
+            // we only need to handle when code is 401 (which mean unauthenticated)
+            if (response.status !== 401) return reject(response)
+            loggerHttp(`Got unautenticated response, buffering request from now ...`)
+
+            // we tell the client to not send authenticated request anymore
+            this.authenticated = false
+
+            loggerHttp(`Asking to the oauth flow to retrieve new tokens`)
+            this.oauth_flow.retrieveTokens((err, data) => {
+              // if it fail, we fail the whole request
+              if (err) {
+                loggerHttp(`Failed to retrieve new tokens : ${err.message || err}`)
+                return reject(response)
+              }
+              // if its good, we try to update the tokens
+              loggerHttp(`Succesfully retrieved new tokens`)
+              this._updateTokens(null, data, (err, authenticated) => {
+                // if it fail, we fail the whole request
+                if (err) return reject(response)
+                // then we can rebuffer the request
+                loggerHttp(`Re-buffering call to ${httpOpts.url} since authenticated now`)
+                return this._axios.request(httpOpts).then(resolve)
+              })
+            })
+          })
       }
     })
   }
@@ -87,9 +116,10 @@ module.exports = class NetworkWrapper {
    * Update the access token used by all the networking clients
    * @param {Error} err if any erro
    * @param {String} accessToken the token you want to use
+   * @param {Function} [cb] invoked with <err, authenticated>
    * @private
    */
-  _updateTokens (err, data) {
+  _updateTokens (err, data, cb) {
     if (err) {
       console.error(`Error while retrieving tokens : ${err.message}`)
       return console.error(err.response ? err.response.data : err.stack)
@@ -97,14 +127,19 @@ module.exports = class NetworkWrapper {
     if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens')
 
     this.tokens = data
+
+    loggerHttp(`Registered new access_token : ${data.access_token}`)
     this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
     this._axios.request({ url: '/api/bucket', method: 'GET' })
       .then((res) => {
         this._buckets = res.data
+        loggerHttp(`Cached ${res.data.length} buckets for current user`)
         this.authenticated = true
+        return typeof cb === 'function' ? cb(null, true) : null
       }).catch((err) => {
         console.error('Error while retrieving buckets')
         console.error(err.response ? err.response.data : err)
+        return typeof cb === 'function' ? cb(err) : null
       })
   }
 
