@@ -84,7 +84,7 @@ module.exports = class NetworkWrapper {
           .catch((error) => {
             let response = error.response
             // we only need to handle when code is 401 (which mean unauthenticated)
-            if (response.status !== 401) return reject(response)
+            if (response && response.status !== 401) return reject(response)
             loggerHttp(`Got unautenticated response, buffering request from now ...`)
 
             // we tell the client to not send authenticated request anymore
