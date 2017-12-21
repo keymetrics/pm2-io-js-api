@@ -29,7 +29,13 @@ module.exports = class RequestValidator {
             if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} to match but got ${value}`))
             }
-            httpOpts.url = httpOpts.url.replace(param.name, value)
+            if (value) {
+              // if value is given, use it
+              httpOpts.url = httpOpts.url.replace(param.name, value)
+            } else if (param.optional === false && param.defaultvalue !== null) {
+              // use default value if available
+              httpOpts.url = httpOpts.url.replace(param.name, param.defaultvalue)
+            }
           }
           for (let param of (endpoint.query || [])) {
             let value = args.shift()
@@ -37,7 +43,13 @@ module.exports = class RequestValidator {
             if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} query but got ${value}`))
             }
-            httpOpts.params[param.name] = value
+            if (value) {
+              // if value is given, use it
+              httpOpts.url = httpOpts.url.replace(param.name, value)
+            } else if (param.optional === false && param.defaultvalue !== null) {
+              // use default value if available
+              httpOpts.url = httpOpts.url.replace(param.name, param.defaultvalue)
+            }
           }
           break
         }
@@ -48,17 +60,23 @@ module.exports = class RequestValidator {
           for (let param of (endpoint.params || [])) {
             let value = args.shift()
             // params should always be a string since they will be replaced in the url
-            if (typeof value !== 'string') {
+            if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} to match but got ${value}`))
             }
             // replace param in url
-            httpOpts.url = httpOpts.url.replace(param.name, value)
+            if (value) {
+              // if value is given, use it
+              httpOpts.url = httpOpts.url.replace(param.name, value)
+            } else if (param.optional === false && param.defaultvalue !== null) {
+              // use default value if available
+              httpOpts.url = httpOpts.url.replace(param.name, param.defaultvalue)
+            }
           }
           let data = args[0]
           if (typeof data !== 'object') {
             return reject(new Error(`Expected to receive an object for post data but received ${typeof data}`))
           }
-          for (let field of endpoint.body) {
+          for (let field of (endpoint.body || [])) {
             // verify that the mandatory field are here
             if (!data[field.name] && field.optional === false && field.defaultvalue === null) {
               return reject(new Error(`Missing mandatory field ${field.name} to make a POST request on ${endpoint.route.name}`))
