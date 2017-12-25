@@ -34,11 +34,16 @@ module.exports = class EmbedStrategy extends AuthStrategy {
       },
       // try to find it in the file system
       (next) => {
-        fs.readFile(path.resolve(os.homedir(), '.keymetrics-token'), (err, token) => {
+        fs.readFile(path.resolve(os.homedir(), '.keymetrics-tokens'), (err, tokens) => {
           if (err) return next(err)
 
           // verify that the token is valid
-          verifyToken(token.toString())
+          tokens = JSON.parse(tokens || '{}')
+          if (new Date(tokens.expire_at) > new Date(new Date().toISOString())) {
+            return next(null, tokens)
+          }
+
+          verifyToken(tokens.refresh_token)
           .then((res) => {
             return next(null, res.data)
           })
@@ -58,8 +63,8 @@ module.exports = class EmbedStrategy extends AuthStrategy {
       }
     ], (err, result) => {
       if (result.refresh_token) {
-        let file = path.resolve(os.homedir(), '.keymetrics-token')
-        fs.writeFile(file, result.refresh_token, () => {
+        let file = path.resolve(os.homedir(), '.keymetrics-tokens')
+        fs.writeFile(file, JSON.stringify(result), () => {
           return cb(err, result)
         })
       } else {
