@@ -11,6 +11,8 @@ module.exports = class RequestValidator {
    * @return {Promise} resolve to the http options need to make the request
    */
   static extract (endpoint, args) {
+    let isDefined = val => val !== null && typeof val !== 'undefined'
+
     return new Promise((resolve, reject) => {
       let httpOpts = {
         params: {},
@@ -78,7 +80,7 @@ module.exports = class RequestValidator {
           }
           for (let field of (endpoint.body || [])) {
             // verify that the mandatory field are here
-            if (!data[field.name] && field.optional === false && field.defaultvalue === null) {
+            if (!isDefined(data[field.name]) && field.optional === false && field.defaultvalue === null) {
               return reject(new Error(`Missing mandatory field ${field.name} to make a POST request on ${endpoint.route.name}`))
             }
             // verify that the mandatory field are the good type
@@ -87,7 +89,7 @@ module.exports = class RequestValidator {
             }
 
             // add it to the request only when its present
-            if (typeof data[field.name] !== 'undefined') {
+            if (isDefined(data[field.name])) {
               httpOpts.data[field.name] = data[field.name]
             }
 
