@@ -23,7 +23,8 @@ module.exports = class NetworkWrapper {
     this._buckets = []
     this._queue = []
     this._axios = axios.create(opts)
-    this._queueWorker = setInterval(this._queueUpdater.bind(this), 100)
+    this._queueWorker = setInterval(this._queueUpdater.bind(this), 10)
+    this._queueWorker.unref()
     this._websockets = []
 
     this.realtime = new EventEmitter({
