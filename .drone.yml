@@ -1,16 +1,22 @@
 pipeline:
-  build:
+  tests:
     image: node:${NODE_VERSION}
     commands:
       - npm install 2> /dev/null
       - export NODE_ENV=test
       - npm run test
     secrets: [ keymetrics_token ]
+    when:
+      event: [ push ]
+  lint:
+    image: node:8
+    commands:
+      - ./node_modules/.bin/standard
+    when:
+      event: [ push ]
   slack:
     image: plugins/slack
     channel: ci
-    when:
-      status: [ success, failure ]
     template: |
       {{#success build.status}}
         {{ repo.name }} : commit {{ build.commit }} on branch "{{ build.branch}}" with node:${NODE_VERSION} done by {{ build.author}} succeeded.
@@ -19,10 +25,22 @@ pipeline:
       {{/success}}
       see {{ build.link }}
     secrets: [ slack_webhook ]
-  linter:
+    when:
+      status: [ success, failure ]
+      event: [ push ]
+  build:
     image: node:8
     commands:
-      - ./node_modules/.bin/standard
+      - npm install 2> /dev/null
+      - npm run build
+      - npm run dist
+    when:
+      event: [ tag ]
+  publish_npm:
+    image: plugins/npm
+    secrets: [ npm_username, npm_password, npm_email ]
+    when:
+      event: [ tag ]
 matrix:
   NODE_VERSION:
     - 4
