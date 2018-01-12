@@ -4,6 +4,7 @@
 
 const Keymetrics = require('..')
 const assert = require('assert')
+const async = require('async')
 
 describe('Keymetrics Integration', () => {
   let km = null
@@ -39,5 +40,25 @@ describe('Keymetrics Integration', () => {
       assert(typeof bucket.secret_id === 'string')
       return done()
     }).catch(done)
+  })
+
+  it('should retrieve some data from bucket', (done) => {
+    let bucket
+    async.series([
+      next => {
+        km.bucket.retrieveAll().then(res => {
+          bucket = res.data[0]
+          return next()
+        }).catch(next)
+      },
+      next => {
+        km.data.status.retrieve(bucket._id).then(res => {
+          let status = res.data
+          assert(res.status === 200)
+          assert(status instanceof Array)
+          return next()
+        }).catch(next)
+      }
+    ], done)
   })
 })

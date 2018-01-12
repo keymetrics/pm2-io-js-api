@@ -10,6 +10,9 @@ const loggerWS = require('debug')('kmjs:network:ws')
 const WS = require('./utils/websocket')
 const EventEmitter = require('eventemitter2')
 const km = require('./keymetrics')
+const async = require('async')
+
+const BUFFERIZED = -1
 
 module.exports = class NetworkWrapper {
   constructor (opts) {
@@ -60,62 +63,114 @@ module.exports = class NetworkWrapper {
   }
 
   /**
+   * Resolve the endpoint of the node to make the request to
+   * because each bucket might be on a different node
+   * @param {String} bucketID the bucket id
+   *
+   * @return {Promise}
+   */
+  _resolveBucketEndpoint (bucketID) {
+    if (!bucketID) return Promise.reject(new Error(`Missing argument : bucketID`))
+    return new Promise((resolve, reject) => {
+      // try to resolve it from local cache
+      const node = this._buckets
+        .filter(bucket => bucket._id === bucketID)
+        .map(bucket => bucket.node_cache)[0]
+      // if found, return it
+      if (node && node.endpoints) {
+        return resolve(node.endpoints.web)
+      }
+      // otherwise we will need to resolve where the bucket is hosted
+      this._axios.request({ url: `/api/bucket/${bucketID}`, method: 'GET' })
+        .then((res) => {
+          const bucket = res.data
+          this._buckets.push(bucket)
+          return resolve(bucket.node_cache.endpoints.web)
+        }).catch(reject)
+    })
+  }
+
+  /**
    * Send a http request
    * @param {Object} opts
    * @param {String} [opts.method=GET] http method
    * @param {String} opts.url the full URL
    * @param {Object} [opts.data] body data
    * @param {Object} [opts.params] url params
+   *
+   * @return {Promise}
    */
   request (httpOpts) {
-    if (httpOpts.url.match(/bucket/)) {
-      let bucketID = httpOpts.url.split('/')[3]
-      let node = this._buckets.filter(bucket => bucket._id === bucketID).map(bucket => bucket.node_cache)[0]
-      if (node && node.endpoints) {
-        httpOpts.baseURL = node.endpoints.web
-      }
-    }
-
     return new Promise((resolve, reject) => {
-      if (this.authenticated === false && httpOpts.authentication === true) {
-        loggerHttp(`Queued request to ${httpOpts.url}`)
-        this._queue.push({
-          resolve,
-          reject,
-          request: httpOpts
-        })
-      } else {
-        loggerHttp(`Making request to ${httpOpts.url}`)
-        this._axios.request(httpOpts)
-          .then(resolve)
-          .catch((error) => {
-            let response = error.response
-            // we only need to handle when code is 401 (which mean unauthenticated)
-            if (response && response.status !== 401) return reject(response)
-            loggerHttp(`Got unautenticated response, buffering request from now ...`)
+      async.series([
+        // we need to verify that the baseURL is correct
+        (next) => {
+          if (!httpOpts.url.match(/bucket\/.+/)) return next()
+          // parse the bucket id from URL
+          let bucketID = httpOpts.url.split('/')[3]
+          // we need to retrieve where to send the request depending on the backend
+          this._resolveBucketEndpoint(bucketID)
+            .then(endpoint => {
+              httpOpts.baseURL = endpoint
+              // then continue the flow
+              return next()
+            }).catch(next)
+        },
+        // verify that we don't need to buffer the request because authentication
+        next => {
+          if (this.authenticated === true || httpOpts.authentication === false) return next()
 
-            // we tell the client to not send authenticated request anymore
-            this.authenticated = false
+          loggerHttp(`Queued request to ${httpOpts.url}`)
+          this._queue.push({
+            resolve,
+            reject,
+            request: httpOpts
+          })
+          // we need to stop the flow here
+          return next(BUFFERIZED)
+        },
+        // if the request has not been bufferized, make the request
+        next => {
+          // super trick to transform a promise response to a callback
+          const successNext = res => next(null, res)
+          loggerHttp(`Making request to ${httpOpts.url}`)
 
-            loggerHttp(`Asking to the oauth flow to retrieve new tokens`)
-            this.oauth_flow.retrieveTokens((err, data) => {
-              // if it fail, we fail the whole request
-              if (err) {
-                loggerHttp(`Failed to retrieve new tokens : ${err.message || err}`)
-                return reject(response)
-              }
-              // if its good, we try to update the tokens
-              loggerHttp(`Succesfully retrieved new tokens`)
-              this._updateTokens(null, data, (err, authenticated) => {
+          this._axios.request(httpOpts)
+            .then(successNext)
+            .catch((error) => {
+              let response = error.response
+              // we only need to handle when code is 401 (which mean unauthenticated)
+              if (response && response.status !== 401) return next(response)
+              loggerHttp(`Got unautenticated response, buffering request from now ...`)
+
+              // we tell the client to not send authenticated request anymore
+              this.authenticated = false
+
+              loggerHttp(`Asking to the oauth flow to retrieve new tokens`)
+              this.oauth_flow.retrieveTokens((err, data) => {
                 // if it fail, we fail the whole request
-                if (err) return reject(response)
-                // then we can rebuffer the request
-                loggerHttp(`Re-buffering call to ${httpOpts.url} since authenticated now`)
-                return this._axios.request(httpOpts).then(resolve)
+                if (err) {
+                  loggerHttp(`Failed to retrieve new tokens : ${err.message || err}`)
+                  return next(response)
+                }
+                // if its good, we try to update the tokens
+                loggerHttp(`Succesfully retrieved new tokens`)
+                this._updateTokens(null, data, (err, authenticated) => {
+                  // if it fail, we fail the whole request
+                  if (err) return next(response)
+                  // then we can rebuffer the request
+                  loggerHttp(`Re-buffering call to ${httpOpts.url} since authenticated now`)
+                  return this._axios.request(httpOpts).then(successNext).catch(next)
+                })
               })
             })
-          })
-      }
+        }
+      ], (err, results) => {
+        // if the flow is stoped because the request has been
+        // buferred, we don't need to do anything
+        if (err === BUFFERIZED) return
+        return err ? reject(err) : resolve(results[2])
+      })
     })
   }
 
