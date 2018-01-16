@@ -103,19 +103,6 @@ module.exports = class NetworkWrapper {
   request (httpOpts) {
     return new Promise((resolve, reject) => {
       async.series([
-        // we need to verify that the baseURL is correct
-        (next) => {
-          if (!httpOpts.url.match(/bucket\/.+/)) return next()
-          // parse the bucket id from URL
-          let bucketID = httpOpts.url.split('/')[3]
-          // we need to retrieve where to send the request depending on the backend
-          this._resolveBucketEndpoint(bucketID)
-            .then(endpoint => {
-              httpOpts.baseURL = endpoint
-              // then continue the flow
-              return next()
-            }).catch(next)
-        },
         // verify that we don't need to buffer the request because authentication
         next => {
           if (this.authenticated === true || httpOpts.authentication === false) return next()
@@ -128,6 +115,19 @@ module.exports = class NetworkWrapper {
           })
           // we need to stop the flow here
           return next(BUFFERIZED)
+        },
+        // we need to verify that the baseURL is correct
+        (next) => {
+          if (!httpOpts.url.match(/bucket\/.+/)) return next()
+          // parse the bucket id from URL
+          let bucketID = httpOpts.url.split('/')[3]
+          // we need to retrieve where to send the request depending on the backend
+          this._resolveBucketEndpoint(bucketID)
+            .then(endpoint => {
+              httpOpts.baseURL = endpoint
+              // then continue the flow
+              return next()
+            }).catch(next)
         },
         // if the request has not been bufferized, make the request
         next => {
