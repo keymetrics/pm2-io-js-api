@@ -19,7 +19,7 @@ describe('Keymetrics Integration', () => {
   })
 
   it('should succesfully retrieve user data', (done) => {
-    km.user.isLogged().then((res) => {
+    km.user.retrieve().then((res) => {
       assert(res.status === 200)
       assert(typeof res.data.username === 'string')
       assert(typeof res.data._id === 'string')
