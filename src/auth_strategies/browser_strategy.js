@@ -2,7 +2,6 @@
 'use strict'
 
 const AuthStrategy = require('./strategy')
-const km = require('../keymetrics')
 
 module.exports = class BrowserFlow extends AuthStrategy {
   removeUrlToken (refreshToken) {
@@ -12,7 +11,7 @@ module.exports = class BrowserFlow extends AuthStrategy {
     window.history.pushState('', '', newUrl)
   }
 
-  retrieveTokens (cb) {
+  retrieveTokens (km, cb) {
     let verifyToken = (refresh) => {
       return km.auth.retrieveToken({
         client_id: this.client_id,

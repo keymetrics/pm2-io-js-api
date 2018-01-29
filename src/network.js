@@ -9,13 +9,12 @@ const loggerHttp = require('debug')('kmjs:network:http')
 const loggerWS = require('debug')('kmjs:network:ws')
 const WS = require('./utils/websocket')
 const EventEmitter = require('eventemitter2')
-const km = require('./keymetrics')
 const async = require('async')
 
 const BUFFERIZED = -1
 
 module.exports = class NetworkWrapper {
-  constructor (opts) {
+  constructor (km, opts) {
     logger('init network manager')
     opts.baseURL = opts.API_URL || 'https://api.keymetrics.io'
     this.opts = opts
@@ -23,6 +22,7 @@ module.exports = class NetworkWrapper {
       refresh_token: null,
       access_token: null
     }
+    this.km = km
     this._buckets = []
     this._queue = []
     this._axios = axios.create(opts)
@@ -81,7 +81,13 @@ module.exports = class NetworkWrapper {
         return resolve(node.endpoints.web)
       }
       // otherwise we will need to resolve where the bucket is hosted
-      this._axios.request({ url: `/api/bucket/${bucketID}`, method: 'GET' })
+      this._axios.request({
+        url: `/api/bucket/${bucketID}`,
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${this.tokens.access_token}`
+        }
+      })
         .then((res) => {
           const bucket = res.data
           this._buckets.push(bucket)
@@ -118,7 +124,7 @@ module.exports = class NetworkWrapper {
         },
         // we need to verify that the baseURL is correct
         (next) => {
-          if (!httpOpts.url.match(/bucket\/.+/)) return next()
+          if (!httpOpts.url.match(/bucket\/[0-9]+[a-z]+|[a-z]+[0-9]+/)) return next()
           // parse the bucket id from URL
           let bucketID = httpOpts.url.split('/')[3]
           // we need to retrieve where to send the request depending on the backend
@@ -134,6 +140,11 @@ module.exports = class NetworkWrapper {
           // super trick to transform a promise response to a callback
           const successNext = res => next(null, res)
           loggerHttp(`Making request to ${httpOpts.url}`)
+
+          if (!httpOpts.headers) {
+            httpOpts.headers = {}
+          }
+          httpOpts.headers.Authorization = `Bearer ${this.tokens.access_token}`
 
           this._axios.request(httpOpts)
             .then(successNext)
@@ -192,17 +203,22 @@ module.exports = class NetworkWrapper {
 
     loggerHttp(`Registered new access_token : ${data.access_token}`)
     this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
-    this._axios.request({ url: '/api/bucket', method: 'GET' })
-      .then((res) => {
-        this._buckets = res.data
-        loggerHttp(`Cached ${res.data.length} buckets for current user`)
-        this.authenticated = true
-        return typeof cb === 'function' ? cb(null, true) : null
-      }).catch((err) => {
-        console.error('Error while retrieving buckets')
-        console.error(err.response ? err.response.data : err)
-        return typeof cb === 'function' ? cb(err) : null
-      })
+    this._axios.request({
+      url: '/api/bucket',
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${data.access_token}`
+      }
+    }).then((res) => {
+      this._buckets = res.data
+      loggerHttp(`Cached ${res.data.length} buckets for current user`)
+      this.authenticated = true
+      return typeof cb === 'function' ? cb(null, true) : null
+    }).catch((err) => {
+      console.error('Error while retrieving buckets')
+      console.error(err.response ? err.response.data : err)
+      return typeof cb === 'function' ? cb(err) : null
+    })
   }
 
   /**
@@ -225,7 +241,7 @@ module.exports = class NetworkWrapper {
       if (!(flow instanceof AuthStrategy)) throw new Error('You must implement the Flow interface to use it')
       let CustomFlow = flow
       this.oauth_flow = new CustomFlow(opts)
-      return this.oauth_flow.retrieveTokens(this.updateTokens.bind(this))
+      return this.oauth_flow.retrieveTokens(this.km, this.updateTokens.bind(this))
     }
     // otherwise fallback on the flow that are implemented
     if (typeof AuthStrategy.implementations(flow) === 'undefined') {
@@ -239,7 +255,7 @@ module.exports = class NetworkWrapper {
     }
     let FlowImpl = flowMeta.nodule
     this.oauth_flow = new FlowImpl(opts)
-    return this.oauth_flow.retrieveTokens(this._updateTokens.bind(this))
+    return this.oauth_flow.retrieveTokens(this.km, this._updateTokens.bind(this))
   }
 
   /**
@@ -252,7 +268,7 @@ module.exports = class NetworkWrapper {
   subscribe (bucketId, opts) {
     return new Promise((resolve, reject) => {
       logger(`Request endpoints for ${bucketId}`)
-      km.bucket.retrieve(bucketId)
+      this.km.bucket.retrieve(bucketId)
         .then((res) => {
           let bucket = res.data
 

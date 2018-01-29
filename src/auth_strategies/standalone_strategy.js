@@ -2,10 +2,9 @@
 'use strict'
 
 const AuthStrategy = require('./strategy')
-const km = require('../keymetrics')
 
 module.exports = class StandaloneFlow extends AuthStrategy {
-  retrieveTokens (cb) {
+  retrieveTokens (km, cb) {
     if (this._opts.refresh_token && this._opts.access_token) {
       // if both access and refresh tokens are provided, we are good
       return cb(null, {

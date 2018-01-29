@@ -6,14 +6,13 @@ const http = require('http')
 const fs = require('fs')
 const url = require('url')
 const exec = require('child_process').exec
-const km = require('../keymetrics')
 const async = require('async')
 const path = require('path')
 const os = require('os')
 
 module.exports = class EmbedStrategy extends AuthStrategy {
   // try to find a token
-  retrieveTokens (cb) {
+  retrieveTokens (km, cb) {
     let verifyToken = (refresh) => {
       return km.auth.retrieveToken({
         client_id: this.client_id,

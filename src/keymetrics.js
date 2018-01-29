@@ -21,7 +21,7 @@ const Keymetrics = class Keymetrics {
     this.opts = Object.assign(constants, opts)
 
     logger('init network client (http/ws)')
-    this._network = new NetworkWrapper(this.opts)
+    this._network = new NetworkWrapper(this, this.opts)
 
     const mapping = opts && opts.mappings ? opts.mappings : require('./api_mappings.json')
     logger(`Using mappings provided in ${opts && opts.mappings ? 'options' : 'package'}`)
@@ -36,8 +36,6 @@ const Keymetrics = class Keymetrics {
     for (let key in root) {
       if (key === 'name' || key === 'opts') continue
       this[key] = root[key]
-      Keymetrics[key] = root[key]
-      exports[key] = root[key]
     }
     logger(`attached namespaces : ${Object.keys(this)}`)
 
