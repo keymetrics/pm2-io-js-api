@@ -124,7 +124,7 @@ module.exports = class NetworkWrapper {
         },
         // we need to verify that the baseURL is correct
         (next) => {
-          if (!httpOpts.url.match(/bucket\/[0-9]+[a-z]+|[a-z]+[0-9]+/)) return next()
+          if (!httpOpts.url.match(/bucket\/[0-9a-fA-F]{24}/)) return next()
           // parse the bucket id from URL
           let bucketID = httpOpts.url.split('/')[3]
           // we need to retrieve where to send the request depending on the backend
