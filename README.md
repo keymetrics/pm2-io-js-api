@@ -45,7 +45,7 @@ km.use('embed', {
 
 After that, you can do whatever call you want just keep in mind each call return a Promise (the client will handle authentication) :
 ```javascript
-km.user.isLogged()
+km.user.retrieve()
   .then((response) => {
    // see https://github.com/mzabriskie/axios#response-schema
    // for the content of response
@@ -148,7 +148,7 @@ km.auth.revoke ===> POST /api/oauth/revoke
 km.user.getOtp ===> GET /api/users/otp
 km.user.addOtp ===> POST /api/users/otp
 km.user.removeOtp ===> DELETE /api/users/otp
-km.user.isLogged ===> GET /api/users/isLogged
+km.user.retrieve ===> GET /api/users/isLogged
 km.user.register ===> GET /api/users/register
 km.user.show ===> GET /api/users/show/:id
 km.user.attachCreditCard ===> POST /api/users/payment/
