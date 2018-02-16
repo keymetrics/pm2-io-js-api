@@ -158,7 +158,7 @@ module.exports = class NetworkWrapper {
               this.authenticated = false
 
               loggerHttp(`Asking to the oauth flow to retrieve new tokens`)
-              this.oauth_flow.retrieveTokens((err, data) => {
+              this.oauth_flow.retrieveTokens(this.km, (err, data) => {
                 // if it fail, we fail the whole request
                 if (err) {
                   loggerHttp(`Failed to retrieve new tokens : ${err.message || err}`)
