@@ -13,7 +13,9 @@ module.exports = class Endpoint {
     let endpoint = this
     return function () {
       let callsite = new Error().stack.split('\n')[2]
-      debug(`Call to '${endpoint.route.name}' from ${callsite.replace('    at ', '')}`)
+      if (callsite && callsite.length > 0) {
+        debug(`Call to '${endpoint.route.name}' from ${callsite.replace('    at ', '')}`)
+      }
       return new Promise((resolve, reject) => {
         RequestValidator.extract(endpoint, Array.prototype.slice.call(arguments))
           .then((opts) => {
