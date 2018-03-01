@@ -26,4 +26,8 @@ module.exports = class StandaloneFlow extends AuthStrategy {
         a refresh and access token OR a refresh token and a client id`)
     }
   }
+
+  deleteTokens (km) {
+    return km.auth.revoke
+  }
 }

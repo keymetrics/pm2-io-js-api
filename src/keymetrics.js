@@ -53,6 +53,11 @@ const Keymetrics = class Keymetrics {
   use (flow, opts) {
     logger(`using ${flow} authentication strategy`)
     this._network.useStrategy(flow, opts)
+    // the logout is dependent of the auth flow so we need it to be initialize
+    // but also we need to give the access of the instance, so we inject it here
+    this.auth.logout = () => {
+      return this._network.oauth_flow.deleteTokens(this)
+    }
     return this
   }
 }

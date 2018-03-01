@@ -18,7 +18,11 @@ const AuthStrategy = class AuthStrategy {
   }
 
   retrieveTokens () {
-    throw new Error('You need to implement the Flow interface to use it')
+    throw new Error('You need to implement a retrieveTokens function inside your strategy')
+  }
+
+  deleteTokens () {
+    throw new Error('You need to implement a deleteTokens function inside your strategy')
   }
 
   static implementations (name) {

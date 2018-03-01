@@ -122,4 +122,17 @@ module.exports = class EmbedStrategy extends AuthStrategy {
     }
     return exec(`${opener} "${escape(target)}"`, callback)
   }
+
+  deleteTokens (km) {
+    return new Promise((resolve, reject) => {
+      // revoke the refreshToken
+      km.auth.revoke()
+      .then(res => {
+        // remove the token from the filesystem
+        let file = path.resolve(os.homedir(), '.keymetrics-tokens')
+        fs.unlinkSync(file)
+        return resolve(res)
+      }).catch(reject)
+    })
+  }
 }

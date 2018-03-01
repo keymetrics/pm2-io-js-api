@@ -1,7 +1,6 @@
 const Keymetrics = require('../index.js')
 
 let km = new Keymetrics({
-  API_URL: 'http://cl1.km.io:3000',
   OAUTH_CLIENT_ID: '9459143721'
 }).use('embed')
 

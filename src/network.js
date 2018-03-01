@@ -87,12 +87,11 @@ module.exports = class NetworkWrapper {
         headers: {
           Authorization: `Bearer ${this.tokens.access_token}`
         }
-      })
-        .then((res) => {
-          const bucket = res.data
-          this._buckets.push(bucket)
-          return resolve(bucket.node_cache.endpoints.web)
-        }).catch(reject)
+      }).then((res) => {
+        const bucket = res.data
+        this._buckets.push(bucket)
+        return resolve(bucket.node_cache.endpoints.web)
+      }).catch(reject)
     })
   }
 
@@ -251,7 +250,7 @@ module.exports = class NetworkWrapper {
 
     // verify that the environnement condition is meet
     if (flowMeta.condition && constants.ENVIRONNEMENT !== flowMeta.condition) {
-      throw new Error(`The flow ${flow} is reserved for ${flowMeta.condition} environ sment`)
+      throw new Error(`The flow ${flow} is reserved for ${flowMeta.condition} environment`)
     }
     let FlowImpl = flowMeta.nodule
     this.oauth_flow = new FlowImpl(opts)

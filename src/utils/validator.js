@@ -75,7 +75,7 @@ module.exports = class RequestValidator {
             }
           }
           let data = args[0]
-          if (typeof data !== 'object') {
+          if (typeof data !== 'object' && endpoint.body.length > 0) {
             return reject(new Error(`Expected to receive an object for post data but received ${typeof data}`))
           }
           for (let field of (endpoint.body || [])) {

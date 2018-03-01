@@ -44,7 +44,23 @@ module.exports = class BrowserFlow extends AuthStrategy {
         }).catch(cb)
     } else {
       // otherwise we need to get a refresh token
-      window.location = `${this.oauth_endpoint}${this.oauth_query}`
+      window.location = `${this.oauth_endpoint}${this.oauth_query}&callbackURI=${window.location}`
     }
+  }
+
+  deleteTokens (km) {
+    return new Promise((resolve, reject) => {
+      // revoke the refreshToken
+      km.auth.revoke()
+      .then(res => {
+        // remove the token from the localStorage
+        localStorage.removeItem('km_refresh_token')
+        setTimeout(_ => {
+          // redirect after few miliseconds so any user code will run
+          window.location = `${this.oauth_endpoint}${this.oauth_query}`
+        }, 500)
+        return resolve(res)
+      }).catch(reject)
+    })
   }
 }
