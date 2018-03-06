@@ -3,10 +3,13 @@ const Keymetrics = require('../index.js')
 process.on('unhandledRejection', (reason, promise) => console.log(reason));
 
 let km = new Keymetrics({
-  API_URL: 'http://cl1.km.io:3000',
-  OAUTH_CLIENT_ID: '795984050'
+  OAUTH_CLIENT_ID: '795984050',
+  services: {
+    API: 'http://cl1.km.io:3000',
+    OAUTH: 'http://cl1.km.io:3100'
+  }
 }).use('standalone', {
-  refresh_token: 'h1n98zf3pmdr95c7vrl51zdd5zni99l9kwi7kht5ty9w99cb1sci86vzezma8dok'
+  refresh_token: '7ny9ay0lnaocpb07cboubev32ytm4w3tl2eteah5h0cbwizac9itndsnmtag2dnm'
 })
 
 // retrieve our buckets

@@ -17,9 +17,12 @@ module.exports = class Namespace {
       let child = mapping[name]
       if (typeof mapping === 'object' && !child.route) {
         // if the parent namespace is a object, the child are namespace too
-        this.addNamespace(new Namespace(child, { name, http: this.http }))
+        this.addNamespace(new Namespace(child, { name, http: this.http, services: opts.services }))
       } else {
-      // otherwise its an endpoint
+        // otherwise its an endpoint
+        if (child.service && opts.services && opts.services[child.service.name]) {
+          child.service.baseURL = opts.services[child.service.name]
+        }
         this.addEndpoint(new Endpoint(child))
       }
     }

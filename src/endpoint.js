@@ -19,6 +19,10 @@ module.exports = class Endpoint {
       return new Promise((resolve, reject) => {
         RequestValidator.extract(endpoint, Array.prototype.slice.call(arguments))
           .then((opts) => {
+            // Different service than default, setup base url in url
+            if (endpoint.service && endpoint.service.baseURL) {
+              opts.url = endpoint.service.baseURL + opts.url
+            }
             http.request(opts).then(resolve, reject)
           })
           .catch(reject)

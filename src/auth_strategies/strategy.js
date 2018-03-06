@@ -12,7 +12,7 @@ const AuthStrategy = class AuthStrategy {
     }
     this.scope = opts.scope || 'all'
     this.response_mode = opts.reponse_mode || 'query'
-    this.oauth_endpoint = `${constants.API_URL}${constants.OAUTH_AUTHORIZE_ENDPOINT}`
+    this.oauth_endpoint = `${constants.services.OAUTH || constants.services.API}${constants.OAUTH_AUTHORIZE_ENDPOINT}`
     this.oauth_query = `?client_id=${opts.client_id}&response_mode=${this.response_mode}` +
       `&response_type=token&scope=${this.scope}`
   }

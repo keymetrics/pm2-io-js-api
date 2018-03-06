@@ -12,8 +12,8 @@ const Keymetrics = class Keymetrics {
  * Keymetrics
  *
  * @param {Object} [opts]
- * @param {String} [opts.API_URL] the base URL to use
  * @param {String} [opts.OAUTH_CLIENT_ID] the oauth client ID used to authenticate to KM
+ * @param {Object} [opts.services] base url for differents services
  * @param {String} [opts.mappings] api mappings
  */
   constructor (opts) {
@@ -30,7 +30,8 @@ const Keymetrics = class Keymetrics {
     logger('building namespaces')
     let root = new Namespace(mapping, {
       name: 'root',
-      http: this._network
+      http: this._network,
+      services: this.opts.services
     })
     logger('exposing namespaces')
     for (let key in root) {
