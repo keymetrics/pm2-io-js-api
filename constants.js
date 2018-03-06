@@ -2,7 +2,9 @@
 const pkg = require('./package.json')
 
 const config = {
-  API_URL: 'https://app.keymetrics.io',
+  services: {
+    API: 'https://app.keymetrics.io'
+  },
   OAUTH_AUTHORIZE_ENDPOINT: '/api/oauth/authorize',
   OAUTH_CLIENT_ID: '795984050',
   ENVIRONNEMENT: process && process.versions && process.versions.node ? 'node' : 'browser',
