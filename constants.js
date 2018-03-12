@@ -3,7 +3,8 @@ const pkg = require('./package.json')
 
 const config = {
   services: {
-    API: 'https://app.keymetrics.io'
+    API: 'https://app.keymetrics.io',
+    OAUTH: 'https://id.keymetrics.io'
   },
   OAUTH_AUTHORIZE_ENDPOINT: '/api/oauth/authorize',
   OAUTH_CLIENT_ID: '795984050',
