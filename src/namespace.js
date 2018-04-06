@@ -16,6 +16,18 @@ module.exports = class Namespace {
     for (let name in mapping) {
       let child = mapping[name]
       if (typeof mapping === 'object' && !child.route) {
+        // ignore the 'default' namespace that should bind to the parent namespace
+        if (name === 'default') {
+          // create the namespace
+          const defaultNamespace = new Namespace(child, { name, http: this.http, services: opts.services })
+          this.namespaces.push(defaultNamespace)
+          // bind property of the default namespace to this namespace
+          for (let key in defaultNamespace) {
+            if (key === 'name' || key === 'opts') continue
+            this[key] = defaultNamespace[key]
+          }
+          continue
+        }
         // if the parent namespace is a object, the child are namespace too
         this.addNamespace(new Namespace(child, { name, http: this.http, services: opts.services }))
       } else {
