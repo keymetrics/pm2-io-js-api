@@ -328,7 +328,12 @@ module.exports = class NetworkWrapper {
           // broadcast in the bus
           socket.onmessage = (msg) => {
             loggerWS(`Received message for bucket ${bucketId} (${(msg.data.length / 1000).toFixed(1)} Kb)`)
-            let data = JSON.parse(msg.data)
+            let data = null
+            try {
+              data = JSON.parse(msg.data)
+            } catch (e) {
+              return loggerWS(`Receive not json message for bucket ${bucketId}`)
+            }
             let packet = data.data[1]
             Object.keys(packet).forEach((event) => {
               if (event === 'server_name') return
