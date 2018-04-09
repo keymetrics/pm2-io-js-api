@@ -44,7 +44,7 @@ module.exports = class BrowserFlow extends AuthStrategy {
         }).catch(cb)
     } else {
       // otherwise we need to get a refresh token
-      window.location = `${this.oauth_endpoint}${this.oauth_query}&callbackURI=${window.location}`
+      window.location = `${this.oauth_endpoint}${this.oauth_query}&redirect_uri=${window.location}`
     }
   }
 
