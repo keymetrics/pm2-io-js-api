@@ -270,6 +270,7 @@ module.exports = class NetworkWrapper {
       this.km.bucket.retrieve(bucketId)
         .then((res) => {
           let bucket = res.data
+          let connected = false
 
           let endpoint = bucket.node_cache.endpoints.realtime || bucket.node_cache.endpoints.web
           endpoint = endpoint.replace('http', 'ws')
@@ -303,6 +304,16 @@ module.exports = class NetworkWrapper {
               keepAliveInterval = null
             }
             keepAliveInterval = setInterval(keepAliveHandler.bind(this), 5000)
+            if (!connected) {
+              connected = true
+              return resolve(socket)
+            }
+          }
+          socket.onmaxreconnect = _ => {
+            if (!connected) {
+              connected = true
+              return reject(new Error('Connection timeout'))
+            }
           }
           socket.onopen = onConnect
           socket.onreconnect = onConnect
@@ -342,7 +353,6 @@ module.exports = class NetworkWrapper {
           }
 
           this._websockets.push(socket)
-          return resolve(socket)
         }).catch(reject)
     })
   }
