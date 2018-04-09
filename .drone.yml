@@ -32,6 +32,7 @@ pipeline:
     image: node:8
     commands:
       - npm install 2> /dev/null
+      - mkdir dist
       - npm run build
       - npm run dist
     when:
