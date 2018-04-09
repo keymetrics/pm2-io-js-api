@@ -15,7 +15,7 @@ const defaultOptions = {
   maxReconnectInterval: 30000,
   reconnectDecay: 1,
   timeoutInterval: 2000,
-  maxReconnectAttempts: null,
+  maxReconnectAttempts: 5,
   randomRatio: 3,
   reconnectOnCleanClose: false
 }
@@ -56,7 +56,7 @@ ReconnectableWebSocket.prototype.open = function () {
   }
 
   if (this._options.maxReconnectAttempts && this._options.maxReconnectAttempts < this._reconnectAttempts) {
-    return
+    return this.onmaxreconnect()
   }
 
   this._syncState()
