@@ -177,8 +177,8 @@ km.actions.triggerScopedAction -> POST /api/bucket/:id/actions/triggerScopedActi
 km.actions.retrieve -> POST /api/bucket/:id/actions/listScopedActions
 km.actions.remove -> POST /api/bucket/:id/actions/deleteScopedAction
 km.auth.retrieveToken -> POST /api/oauth/token
-km.auth.requestNewPassword -> POST /api/users/reset_password
-km.auth.register -> GET /api/users/register
+km.auth.requestNewPassword -> POST /api/oauth/reset_password
+km.auth.register -> GET /api/oauth/register
 km.auth.revoke -> POST /api/oauth/revoke
 km.misc.retrievePM2Version -> GET /api/misc/release/pm2
 km.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
