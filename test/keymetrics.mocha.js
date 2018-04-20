@@ -6,7 +6,8 @@ const Keymetrics = require('..')
 const assert = require('assert')
 const async = require('async')
 
-describe('Keymetrics Integration', () => {
+describe('Keymetrics Integration', function () {
+  this.timeout(5000)
   let km = null
   it('should instanciate keymetrics', () => {
     km = new Keymetrics().use('standalone', {
