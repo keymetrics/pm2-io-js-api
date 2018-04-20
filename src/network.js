@@ -348,7 +348,7 @@ module.exports = class NetworkWrapper {
             let packet = data.data[1]
             Object.keys(packet).forEach((event) => {
               if (event === 'server_name') return
-              this.realtime.emit(`${bucket.public_id}:${data.server_name || 'none'}:${event}`, packet[event])
+              this.realtime.emit(`${bucket.public_id}:${packet.server_name || 'none'}:${event}`, packet[event])
             })
           }
 
