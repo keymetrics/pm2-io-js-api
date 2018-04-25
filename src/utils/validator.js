@@ -74,6 +74,8 @@ module.exports = class RequestValidator {
               httpOpts.url = httpOpts.url.replace(param.name, param.defaultvalue)
             }
           }
+          // if we don't have any arguments, break
+          if (args.length === 0) break
           let data = args[0]
           if (typeof data !== 'object' && endpoint.body.length > 0) {
             return reject(new Error(`Expected to receive an object for post data but received ${typeof data}`))
