@@ -1,6 +1,6 @@
 {
   "name": "kmjs-core",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "Official Keymetrics API Client for Javascript",
   "main": "index.js",
   "engines": {
