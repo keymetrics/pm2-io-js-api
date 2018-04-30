@@ -203,6 +203,9 @@ km.auth.retrieveToken -> POST /api/oauth/token
 km.auth.requestNewPassword -> POST /api/oauth/reset_password
 km.auth.register -> GET /api/oauth/register
 km.auth.revoke -> POST /api/oauth/revoke
+km.bucket.alert.update -> POST /api/bucket/:id/alerts/update
+km.bucket.alert.updateSlack -> POST /api/bucket/:id/alerts/updateSlack
+km.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
 km.misc.retrievePM2Version -> GET /api/misc/release/pm2
 km.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
 km.misc.retrievePlans -> GET /api/misc/plans
