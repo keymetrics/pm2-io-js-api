@@ -26,14 +26,6 @@ module.exports = class NetworkWrapper {
     this._buckets = []
     this._queue = []
     this._axios = axios.create(opts)
-    this._queueWorker = setInterval(this._queueUpdater.bind(this), 10)
-
-    // if we are running on nodejs, we need to unref the worker : why ?
-    // For example, in a CLI, it will not close after executing because
-    // there is still the setInterval scheduled (see how the event loop works)
-    if (typeof this._queueWorker.unref === 'function') {
-      this._queueWorker.unref()
-    }
     this._websockets = []
 
     this.realtime = new EventEmitter({
@@ -212,6 +204,7 @@ module.exports = class NetworkWrapper {
       this._buckets = res.data
       loggerHttp(`Cached ${res.data.length} buckets for current user`)
       this.authenticated = true
+      this._queueUpdater()
       return typeof cb === 'function' ? cb(null, true) : null
     }).catch((err) => {
       console.error('Error while retrieving buckets')
