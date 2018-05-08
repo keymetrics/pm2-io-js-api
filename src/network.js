@@ -26,7 +26,6 @@ module.exports = class NetworkWrapper {
     this._buckets = []
     this._queue = []
     this._axios = axios.create(opts)
-    this._queueWorker = setInterval(this._queueUpdater.bind(this), 10)
 
     this._websockets = []
 
@@ -114,6 +113,10 @@ module.exports = class NetworkWrapper {
             reject,
             request: httpOpts
           })
+
+          if (!this._queueWorker)
+            this._queueWorker = setInterval(this._queueUpdater.bind(this), 10)
+
           // we need to stop the flow here
           return next(BUFFERIZED)
         },
