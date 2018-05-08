@@ -236,11 +236,12 @@ module.exports = class NetworkWrapper {
     }
 
     // in the case of flow being a custom implementation
-    if (typeof flow === 'function') {
-      if (!(flow instanceof AuthStrategy)) throw new Error('You must implement the Flow interface to use it')
-      let CustomFlow = flow
-      this.oauth_flow = new CustomFlow(opts)
-      return this.oauth_flow.retrieveTokens(this.km, this.updateTokens.bind(this))
+    if (typeof flow === 'object') {
+      this.oauth_flow = flow
+      if (!this.oauth_flow.retrieveTokens || !this.oauth_flow.deleteTokens) {
+        throw new Error('You must implement the Strategy interface to use it')
+      }
+      return this.oauth_flow.retrieveTokens(this.km, this._updateTokens.bind(this))
     }
     // otherwise fallback on the flow that are implemented
     if (typeof AuthStrategy.implementations(flow) === 'undefined') {
