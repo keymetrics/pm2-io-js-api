@@ -114,8 +114,7 @@ module.exports = class NetworkWrapper {
             request: httpOpts
           })
 
-          if (!this._queueWorker)
-            this._queueWorker = setInterval(this._queueUpdater.bind(this), 10)
+          if (!this._queueWorker) this._queueWorker = setInterval(this._queueUpdater.bind(this), 10)
 
           // we need to stop the flow here
           return next(BUFFERIZED)
