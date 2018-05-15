@@ -1,7 +1,7 @@
 {
-  "name": "kmjs-core",
+  "name": "@pm2/js-api",
   "version": "0.5.9",
-  "description": "Official Keymetrics API Client for Javascript",
+  "description": "PM2.io API Client for Javascript",
   "main": "index.js",
   "engines": {
     "node": ">=4.0"

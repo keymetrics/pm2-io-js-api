@@ -1,13 +1,13 @@
-# Keymetrics API Javascript client
+# PM2.io API Client for Javascript
 
-This module lets you implement a fully customizable Keymetrics client, receiving live data from the Keymetrics API.
+This module lets you implement a fully customizable PM2.io client, receiving live data from the PM2.io API.
 
 ## Install
 
 With NPM:
 
 ```bash
-$ npm install kmjs-core --save
+$ npm install @pm2/js-api --save
 ```
 
 ## Usage
@@ -15,37 +15,37 @@ $ npm install kmjs-core --save
 To use this client you need to first requiring it into your code and creating a new instance :
 
 ```javascript
-const Keymetrics = require('kmjs-core')
+const PM2IO = require('@pm2/js-api')
 
-let km = new Keymetrics()
+let client = new PM2IO()
 ```
 
 Then you'll to tell the client how you want to authenticate, you have the choice :
 
 - First the `standalone` flow, you just need to enter a refresh token and it will works
 ```javascript
-km.use('standalone', {
+client.use('standalone', {
   refresh_token: 'token'
 })
 ```
 
 - Secondly, the `browser` flow, you have a custom keymetrics application and you want to authenticate of the behalf for any user (in this flow you need to be inside a browser) :
 ```javascript
-km.use('browser', {
+client.use('browser', {
   client_id: 'my-oauth-client-id'
 })
 ```
 
 - Thirdly, the `embed` flow, you have a custom keymetrics application and you want to authenticate of the behalf of any user (you need to be in a nodejs process, for example a CLI) :
 ```javascript
-km.use('embed', {
+client.use('embed', {
   client_id: 'my-oauth-client-id'
 })
 ```
 
 After that, you can do whatever call you want just keep in mind each call return a Promise (the client will handle authentication) :
 ```javascript
-km.user.retrieve()
+client.user.retrieve()
   .then((response) => {
    // see https://github.com/mzabriskie/axios#response-schema
    // for the content of response
@@ -58,28 +58,28 @@ km.user.retrieve()
 ## Example
 
 ```javascript
-const Keymetrics = require('km.js')
+const PM2IO = require('@pm2/js-api')
 
-let km = new Keymetrics().use('standalone', {
+let client = new PM2IO().use('standalone', {
   refresh_token: 'token'
 })
 
 // retrieve our buckets
-km.bucket.retrieveAll()
+client.bucket.retrieveAll()
   .then((res) => {
     // find our bucket
     let bucket = res.data.find(bucket => bucket.name === 'Keymetrics')
 
     // connect to realtime data of a bucket
-    km.realtime.subscribe(bucket._id).catch(console.error)
+    client.realtime.subscribe(bucket._id).catch(console.error)
 
     // attach handler on specific realtime data
-    km.realtime.on(`${bucket.public_id}:connected`, () => console.log('connected to realtime'))
-    km.realtime.on(`${bucket.public_id}:*:status`, (data) => console.log(data.server_name))
+    client.realtime.on(`${bucket.public_id}:connected`, () => console.log('connected to realtime'))
+    client.realtime.on(`${bucket.public_id}:*:status`, (data) => console.log(data.server_name))
 
     // we can also unsubscribe from a bucket realtime data
     setTimeout(() => {
-      km.realtime.unsubscribe(bucket._id).catch(console.error)
+      client.realtime.unsubscribe(bucket._id).catch(console.error)
     }, 5000)
   })
   .catch(console.error)
@@ -99,7 +99,7 @@ For example :
 // here i listen on the status data for
 // the server "my_server" on the bucket with
 // the public id 4398545
-km.realtime.on(`4398545:my_server:status`, (data) => {
+client.realtime.on(`4398545:my_server:status`, (data) => {
   console.log(data.server_name))
 }
 ```
@@ -107,108 +107,108 @@ km.realtime.on(`4398545:my_server:status`, (data) => {
 ## Route definition
 
 ```
-km.user.otp.retrieve -> GET /api/users/otp
-km.user.otp.enable -> POST /api/users/otp
-km.user.otp.disable -> DELETE /api/users/otp
-km.user.providers.retrieve -> GET /api/users/integrations
-km.user.providers.add -> POST /api/users/integrations
-km.user.providers.remove -> DELETE /api/users/integrations/:name
-km.user.retrieve -> GET /api/users/isLogged
-km.user.show -> GET /api/users/show/:id
-km.user.attachCreditCard -> POST /api/users/payment/
-km.user.listSubscriptions -> GET /api/users/payment/subcriptions
-km.user.listCharges -> GET /api/users/payment/charges
-km.user.fetchCreditCard -> GET /api/users/payment/card/:card_id
-km.user.fetchDefaultCreditCard -> GET /api/users/payment/card
-km.user.updateCreditCard -> PUT /api/users/payment/card
-km.user.deleteCreditCard -> DELETE /api/users/payment/card/:card_id
-km.user.setDefaultCard -> POST /api/users/payment/card/:card_id/default
-km.user.fetchMetadata -> GET /api/users/payment/card/stripe_metadata
-km.user.updateMetadata -> PUT /api/users/payment/stripe_metadata
-km.user.update -> POST /api/users/update
-km.tokens.retrieve -> GET /api/users/token/
-km.tokens.remove -> DELETE /api/users/token/:id
-km.tokens.create -> PUT /api/users/token/
-km.bucket.sendFeedback -> PUT /api/bucket/:id/feedback
-km.bucket.retrieveUsers -> GET /api/bucket/:id/users_authorized
-km.bucket.currentRole -> GET /api/bucket/:id/current_role
-km.bucket.setNotificationState -> POST /api/bucket/:id/manage_notif
-km.bucket.inviteUser -> POST /api/bucket/:id/add_user
-km.bucket.removeInvitation -> DELETE /api/bucket/:id/invitation/:email
-km.bucket.removeUser -> POST /api/bucket/:id/remove_user
-km.bucket.setUserRole -> POST /api/bucket/:id/promote_user
-km.bucket.retrieveAll -> GET /api/bucket/
-km.bucket.create -> POST /api/bucket/create_classic
-km.bucket.claimTrial -> PUT /api/bucket/:id/start_trial
-km.bucket.upgrade -> POST /api/bucket/:id/upgrade
-km.bucket.retrieve -> GET /api/bucket/:id
-km.bucket.update -> PUT /api/bucket/:id
-km.bucket.retrieveServers -> GET /api/bucket/:id/meta_servers
-km.bucket.getSubscription -> GET /api/bucket/:id/subscription
-km.bucket.destroy -> DELETE /api/bucket/:id
-km.bucket.transferOwnership -> POST /api/bucket/:id/transfer_ownership
-km.bucket.retrieveCharges -> GET /api/bucket/:id/payment/charges
-km.data.status.retrieve -> GET /api/bucket/:id/data/status
-km.data.heapdump.retrieve -> GET /api/bucket/:id/data/heapdump/:filename
-km.data.events.retrieve -> POST /api/bucket/:id/data/events
-km.data.events.retrieveMetadatas -> GET /api/bucket/:id/data/events/eventsKeysByApp
-km.data.events.retrieveHistogram -> POST /api/bucket/:id/data/events/stats
-km.data.events.deleteAll -> DELETE /api/bucket/:id/data/events/delete_all
-km.data.exceptions.retrieve -> POST /api/bucket/:id/data/exceptions
-km.data.exceptions.retrieveSummary -> GET /api/bucket/:id/data/exceptions/summary
-km.data.exceptions.deleteAll -> POST /api/bucket/:id/data/exceptions/delete_all
-km.data.exceptions.delete -> POST /api/bucket/:id/data/exceptions/delete
-km.data.issues.retrieve -> POST /api/bucket/:id/data/issues
-km.data.issues.retrieveHistogram -> POST /api/bucket/:id/data/issues/histogram
-km.data.issues.findOccurences -> POST /api/bucket/:id/data/issues/ocurrences
-km.data.issues.search -> POST /api/bucket/:id/data/issues/search
-km.data.issues.deleteAll -> DELETE /api/bucket/:id/data/issues/
-km.data.issues.delete -> DELETE /api/bucket/:id/data/issues/:identifier
-km.data.processes.retrieveEvents -> POST /api/bucket/:id/data/processEvents
-km.data.processes.retrieveDeployments -> POST /api/bucket/:id/data/processEvents/deployments
-km.data.metrics.retrieveAggregations -> POST /api/bucket/:id/data/metrics/aggregations
-km.data.metrics.retrieveMetadatas -> POST /api/bucket/:id/data/metrics
-km.data.transactions.retrieveHistogram -> POST /api/bucket/:id/data/transactions/v2/histogram
-km.data.transactions.retrieveSummary -> POST /api/bucket/:id/data/transactions/v2/histogram
-km.data.transactions.delete -> POST /api/bucket/:id/data/transactions/v2/delete
-km.data.dependencies.retrieve -> POST /api/bucket/:id/data/dependencies/
-km.data.outliers.retrieve -> POST /api/bucket/:id/data/outliers/
-km.data.logs.retrieve -> POST /api/bucket/:id/data/logs
-km.data.logs.retrieveHistogram -> POST /api/bucket/:id/data/logs/histogram
-km.bucket.billing.subscribe -> POST /api/bucket/:id/payment/subscribe
-km.bucket.billing.startTrial -> PUT /api/bucket/:id/payment/trial
-km.bucket.billing.getInvoices -> GET /api/bucket/:id/payment/invoices
-km.bucket.billing.getSubcription -> GET /api/bucket/:id/payment/subscription
-km.bucket.billing.attachCreditCard -> POST /api/bucket/:id/payment/cards
-km.bucket.billing.fetchCreditCards -> GET /api/bucket/:id/payment/cards
-km.bucket.billing.fetchCreditCard -> GET /api/bucket/:id/payment/card/:card_id
-km.bucket.billing.fetchDefaultCreditCard -> GET /api/bucket/:id/payment/card
-km.bucket.billing.updateCreditCard -> PUT /api/bucket/:id/payment/card
-km.bucket.billing.deleteCreditCard -> DELETE /api/bucket/:id/payment/card/:card_id
-km.bucket.billing.setDefaultCard -> POST /api/bucket/:id/payment/card/:card_id/default
-km.bucket.billing.fetchMetadata -> GET /api/bucket/:id/payment
-km.bucket.billing.updateMetadata -> PUT /api/bucket/:id/payment
-km.dashboard.retrieveAll -> GET /api/bucket/:id/dashboard/
-km.dashboard.retrieve -> GET /api/bucket/:id/dashboard/:dashid
-km.dashboard.remove -> DELETE /api/bucket/:id/dashboard/:dashid
-km.dashboard.update -> POST /api/bucket/:id/dashboard/:dashId
-km.dashboard.create -> PUT /api/bucket/:id/dashboard/
-km.orchestration.selfSend -> POST /api/bucket/:id/balance
-km.actions.triggerAction -> POST /api/bucket/:id/actions/trigger
-km.actions.triggerPM2Action -> POST /api/bucket/:id/actions/triggerPM2
-km.actions.triggerScopedAction -> POST /api/bucket/:id/actions/triggerScopedAction
-km.actions.retrieve -> POST /api/bucket/:id/actions/listScopedActions
-km.actions.remove -> POST /api/bucket/:id/actions/deleteScopedAction
-km.auth.retrieveToken -> POST /api/oauth/token
-km.auth.requestNewPassword -> POST /api/oauth/reset_password
-km.auth.register -> GET /api/oauth/register
-km.auth.revoke -> POST /api/oauth/revoke
-km.bucket.alert.update -> POST /api/bucket/:id/alerts/update
-km.bucket.alert.updateSlack -> POST /api/bucket/:id/alerts/updateSlack
-km.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
-km.misc.retrievePM2Version -> GET /api/misc/release/pm2
-km.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
-km.misc.retrievePlans -> GET /api/misc/plans
+client.user.otp.retrieve -> GET /api/users/otp
+client.user.otp.enable -> POST /api/users/otp
+client.user.otp.disable -> DELETE /api/users/otp
+client.user.providers.retrieve -> GET /api/users/integrations
+client.user.providers.add -> POST /api/users/integrations
+client.user.providers.remove -> DELETE /api/users/integrations/:name
+client.user.retrieve -> GET /api/users/isLogged
+client.user.show -> GET /api/users/show/:id
+client.user.attachCreditCard -> POST /api/users/payment/
+client.user.listSubscriptions -> GET /api/users/payment/subcriptions
+client.user.listCharges -> GET /api/users/payment/charges
+client.user.fetchCreditCard -> GET /api/users/payment/card/:card_id
+client.user.fetchDefaultCreditCard -> GET /api/users/payment/card
+client.user.updateCreditCard -> PUT /api/users/payment/card
+client.user.deleteCreditCard -> DELETE /api/users/payment/card/:card_id
+client.user.setDefaultCard -> POST /api/users/payment/card/:card_id/default
+client.user.fetchMetadata -> GET /api/users/payment/card/stripe_metadata
+client.user.updateMetadata -> PUT /api/users/payment/stripe_metadata
+client.user.update -> POST /api/users/update
+client.tokens.retrieve -> GET /api/users/token/
+client.tokens.remove -> DELETE /api/users/token/:id
+client.tokens.create -> PUT /api/users/token/
+client.bucket.sendFeedback -> PUT /api/bucket/:id/feedback
+client.bucket.retrieveUsers -> GET /api/bucket/:id/users_authorized
+client.bucket.currentRole -> GET /api/bucket/:id/current_role
+client.bucket.setNotificationState -> POST /api/bucket/:id/manage_notif
+client.bucket.inviteUser -> POST /api/bucket/:id/add_user
+client.bucket.removeInvitation -> DELETE /api/bucket/:id/invitation/:email
+client.bucket.removeUser -> POST /api/bucket/:id/remove_user
+client.bucket.setUserRole -> POST /api/bucket/:id/promote_user
+client.bucket.retrieveAll -> GET /api/bucket/
+client.bucket.create -> POST /api/bucket/create_classic
+client.bucket.claimTrial -> PUT /api/bucket/:id/start_trial
+client.bucket.upgrade -> POST /api/bucket/:id/upgrade
+client.bucket.retrieve -> GET /api/bucket/:id
+client.bucket.update -> PUT /api/bucket/:id
+client.bucket.retrieveServers -> GET /api/bucket/:id/meta_servers
+client.bucket.getSubscription -> GET /api/bucket/:id/subscription
+client.bucket.destroy -> DELETE /api/bucket/:id
+client.bucket.transferOwnership -> POST /api/bucket/:id/transfer_ownership
+client.bucket.retrieveCharges -> GET /api/bucket/:id/payment/charges
+client.data.status.retrieve -> GET /api/bucket/:id/data/status
+client.data.heapdump.retrieve -> GET /api/bucket/:id/data/heapdump/:filename
+client.data.events.retrieve -> POST /api/bucket/:id/data/events
+client.data.events.retrieveMetadatas -> GET /api/bucket/:id/data/events/eventsKeysByApp
+client.data.events.retrieveHistogram -> POST /api/bucket/:id/data/events/stats
+client.data.events.deleteAll -> DELETE /api/bucket/:id/data/events/delete_all
+client.data.exceptions.retrieve -> POST /api/bucket/:id/data/exceptions
+client.data.exceptions.retrieveSummary -> GET /api/bucket/:id/data/exceptions/summary
+client.data.exceptions.deleteAll -> POST /api/bucket/:id/data/exceptions/delete_all
+client.data.exceptions.delete -> POST /api/bucket/:id/data/exceptions/delete
+client.data.issues.retrieve -> POST /api/bucket/:id/data/issues
+client.data.issues.retrieveHistogram -> POST /api/bucket/:id/data/issues/histogram
+client.data.issues.findOccurences -> POST /api/bucket/:id/data/issues/ocurrences
+client.data.issues.search -> POST /api/bucket/:id/data/issues/search
+client.data.issues.deleteAll -> DELETE /api/bucket/:id/data/issues/
+client.data.issues.delete -> DELETE /api/bucket/:id/data/issues/:identifier
+client.data.processes.retrieveEvents -> POST /api/bucket/:id/data/processEvents
+client.data.processes.retrieveDeployments -> POST /api/bucket/:id/data/processEvents/deployments
+client.data.metrics.retrieveAggregations -> POST /api/bucket/:id/data/metrics/aggregations
+client.data.metrics.retrieveMetadatas -> POST /api/bucket/:id/data/metrics
+client.data.transactions.retrieveHistogram -> POST /api/bucket/:id/data/transactions/v2/histogram
+client.data.transactions.retrieveSummary -> POST /api/bucket/:id/data/transactions/v2/histogram
+client.data.transactions.delete -> POST /api/bucket/:id/data/transactions/v2/delete
+client.data.dependencies.retrieve -> POST /api/bucket/:id/data/dependencies/
+client.data.outliers.retrieve -> POST /api/bucket/:id/data/outliers/
+client.data.logs.retrieve -> POST /api/bucket/:id/data/logs
+client.data.logs.retrieveHistogram -> POST /api/bucket/:id/data/logs/histogram
+client.bucket.billing.subscribe -> POST /api/bucket/:id/payment/subscribe
+client.bucket.billing.startTrial -> PUT /api/bucket/:id/payment/trial
+client.bucket.billing.getInvoices -> GET /api/bucket/:id/payment/invoices
+client.bucket.billing.getSubcription -> GET /api/bucket/:id/payment/subscription
+client.bucket.billing.attachCreditCard -> POST /api/bucket/:id/payment/cards
+client.bucket.billing.fetchCreditCards -> GET /api/bucket/:id/payment/cards
+client.bucket.billing.fetchCreditCard -> GET /api/bucket/:id/payment/card/:card_id
+client.bucket.billing.fetchDefaultCreditCard -> GET /api/bucket/:id/payment/card
+client.bucket.billing.updateCreditCard -> PUT /api/bucket/:id/payment/card
+client.bucket.billing.deleteCreditCard -> DELETE /api/bucket/:id/payment/card/:card_id
+client.bucket.billing.setDefaultCard -> POST /api/bucket/:id/payment/card/:card_id/default
+client.bucket.billing.fetchMetadata -> GET /api/bucket/:id/payment
+client.bucket.billing.updateMetadata -> PUT /api/bucket/:id/payment
+client.dashboard.retrieveAll -> GET /api/bucket/:id/dashboard/
+client.dashboard.retrieve -> GET /api/bucket/:id/dashboard/:dashid
+client.dashboard.remove -> DELETE /api/bucket/:id/dashboard/:dashid
+client.dashboard.update -> POST /api/bucket/:id/dashboard/:dashId
+client.dashboard.create -> PUT /api/bucket/:id/dashboard/
+client.orchestration.selfSend -> POST /api/bucket/:id/balance
+client.actions.triggerAction -> POST /api/bucket/:id/actions/trigger
+client.actions.triggerPM2Action -> POST /api/bucket/:id/actions/triggerPM2
+client.actions.triggerScopedAction -> POST /api/bucket/:id/actions/triggerScopedAction
+client.actions.retrieve -> POST /api/bucket/:id/actions/listScopedActions
+client.actions.remove -> POST /api/bucket/:id/actions/deleteScopedAction
+client.auth.retrieveToken -> POST /api/oauth/token
+client.auth.requestNewPassword -> POST /api/oauth/reset_password
+client.auth.register -> GET /api/oauth/register
+client.auth.revoke -> POST /api/oauth/revoke
+client.bucket.alert.update -> POST /api/bucket/:id/alerts/update
+client.bucket.alert.updateSlack -> POST /api/bucket/:id/alerts/updateSlack
+client.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
+client.misc.retrievePM2Version -> GET /api/misc/release/pm2
+client.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
+client.misc.retrievePlans -> GET /api/misc/plans
 ```
 
 ## Tasks
@@ -225,3 +225,34 @@ $ npm run doc
 ## License
 
 Apache 2.0
+
+## Release
+
+## Release
+
+To release a new version, first install [gren](https://github.com/github-tools/github-release-notes) :
+```bash
+yarn global add github-release-notes
+```
+
+Push a commit in github with the new version you want to release : 
+```
+git commit -am "version: major|minor|patch bump to X.X.X"
+```
+
+Care for the **versionning**, we use the [semver versioning](https://semver.org/) currently. Please be careful about the version when pushing a new package.
+
+Then tag a version with git : 
+```bash
+git tag -s vX.X.X
+```
+
+Push the tag into github (this will trigger the publish to npm) : 
+```
+git push origin vX.X.X
+```
+
+To finish update the changelog of the release on github with `gren` (be sure that gren has selected the right tags):
+```
+gren release -o -D commits -u keymetrics -r pm2-io-js-api
+```
