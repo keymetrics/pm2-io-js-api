@@ -45,12 +45,13 @@ module.exports = class RequestValidator {
             if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} query but got ${value}`))
             }
+            // set query value
             if (value) {
               // if value is given, use it
-              httpOpts.url = httpOpts.url.replace(param.name, value)
+              httpOpts.params[param.name] = value
             } else if (param.optional === false && param.defaultvalue !== null) {
               // use default value if available
-              httpOpts.url = httpOpts.url.replace(param.name, param.defaultvalue)
+              httpOpts.params[param.name] = param.defaultvalue
             }
           }
           break
@@ -72,6 +73,21 @@ module.exports = class RequestValidator {
             } else if (param.optional === false && param.defaultvalue !== null) {
               // use default value if available
               httpOpts.url = httpOpts.url.replace(param.name, param.defaultvalue)
+            }
+          }
+          for (let param of (endpoint.query || [])) {
+            let value = args.shift()
+            // query should always be a string since they will be replaced in the url
+            if (typeof value !== 'string' && param.optional === false) {
+              return reject(new Error(`Expected to receive string argument for ${param.name} query but got ${value}`))
+            }
+            // set query value
+            if (value) {
+              // if value is given, use it
+              httpOpts.params[param.name] = value
+            } else if (param.optional === false && param.defaultvalue !== null) {
+              // use default value if available
+              httpOpts.params[param.name] = param.defaultvalue
             }
           }
           // if we don't have any arguments, break
@@ -107,18 +123,32 @@ module.exports = class RequestValidator {
           for (let param of (endpoint.params || [])) {
             let value = args.shift()
             // params should always be a string since they will be replaced in the url
-            if (typeof value !== 'string') {
+            if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} to match but got ${value}`))
             }
-            httpOpts.url = httpOpts.url.replace(param.name, value)
+            // replace param in url
+            if (value) {
+              // if value is given, use it
+              httpOpts.url = httpOpts.url.replace(param.name, value)
+            } else if (param.optional === false && param.defaultvalue !== null) {
+              // use default value if available
+              httpOpts.url = httpOpts.url.replace(param.name, param.defaultvalue)
+            }
           }
           for (let param of (endpoint.query || [])) {
             let value = args.shift()
             // query should always be a string
-            if (typeof value !== 'string') {
+            if (typeof value !== 'string' && param.optional === false) {
               return reject(new Error(`Expected to receive string argument for ${param.name} query but got ${value}`))
             }
-            httpOpts.params[param.name] = value
+            // replace param in url
+            if (value) {
+              // if value is given, use it
+              httpOpts.params[param.name] = value
+            } else if (param.optional === false && param.defaultvalue !== null) {
+              // use default value if available
+              httpOpts.params[param.name] = param.defaultvalue
+            }
           }
           break
         }
