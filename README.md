@@ -162,14 +162,15 @@ client.data.issues.retrieve -> POST /api/bucket/:id/data/issues
 client.data.issues.retrieveHistogram -> POST /api/bucket/:id/data/issues/histogram
 client.data.issues.findOccurences -> POST /api/bucket/:id/data/issues/ocurrences
 client.data.issues.search -> POST /api/bucket/:id/data/issues/search
-client.data.issues.deleteAll -> DELETE /api/bucket/:id/data/issues/
+client.data.issues.deleteAll -> DELETE /api/bucket/:id/data/issues
 client.data.issues.delete -> DELETE /api/bucket/:id/data/issues/:identifier
 client.data.processes.retrieveEvents -> POST /api/bucket/:id/data/processEvents
 client.data.processes.retrieveDeployments -> POST /api/bucket/:id/data/processEvents/deployments
 client.data.metrics.retrieveAggregations -> POST /api/bucket/:id/data/metrics/aggregations
+client.data.metrics.retrieveHistogram -> POST /api/bucket/:id/data/metrics/histogram
 client.data.metrics.retrieveMetadatas -> POST /api/bucket/:id/data/metrics
 client.data.transactions.retrieveHistogram -> POST /api/bucket/:id/data/transactions/v2/histogram
-client.data.transactions.retrieveSummary -> POST /api/bucket/:id/data/transactions/v2/histogram
+client.data.transactions.retrieveSummary -> POST /api/bucket/:id/data/transactions/v2/summary
 client.data.transactions.delete -> POST /api/bucket/:id/data/transactions/v2/delete
 client.data.dependencies.retrieve -> POST /api/bucket/:id/data/dependencies/
 client.data.outliers.retrieve -> POST /api/bucket/:id/data/outliers/
@@ -178,6 +179,7 @@ client.data.logs.retrieveHistogram -> POST /api/bucket/:id/data/logs/histogram
 client.bucket.billing.subscribe -> POST /api/bucket/:id/payment/subscribe
 client.bucket.billing.startTrial -> PUT /api/bucket/:id/payment/trial
 client.bucket.billing.getInvoices -> GET /api/bucket/:id/payment/invoices
+client.bucket.billing.getReceipts -> GET /api/bucket/:id/payment/receipts
 client.bucket.billing.getSubcription -> GET /api/bucket/:id/payment/subscription
 client.bucket.billing.attachCreditCard -> POST /api/bucket/:id/payment/cards
 client.bucket.billing.fetchCreditCards -> GET /api/bucket/:id/payment/cards
@@ -209,6 +211,9 @@ client.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
 client.misc.retrievePM2Version -> GET /api/misc/release/pm2
 client.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
 client.misc.retrievePlans -> GET /api/misc/plans
+client.misc.retrieveCoupon -> POST /api/misc/stripe/retrieveCoupon
+client.misc.retrieveCompany -> POST /api/misc/stripe/retrieveCompany
+client.misc.retrieveVAT -> POST /api/misc/stripe/retrieveVat
 ```
 
 ## Tasks
