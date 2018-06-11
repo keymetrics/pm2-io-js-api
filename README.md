@@ -134,7 +134,7 @@ client.bucket.retrieveUsers -> GET /api/bucket/:id/users_authorized
 client.bucket.currentRole -> GET /api/bucket/:id/current_role
 client.bucket.setNotificationState -> POST /api/bucket/:id/manage_notif
 client.bucket.inviteUser -> POST /api/bucket/:id/add_user
-client.bucket.removeInvitation -> DELETE /api/bucket/:id/invitation/:email
+client.bucket.removeInvitation -> DELETE /api/bucket/:id/invitation
 client.bucket.removeUser -> POST /api/bucket/:id/remove_user
 client.bucket.setUserRole -> POST /api/bucket/:id/promote_user
 client.bucket.retrieveAll -> GET /api/bucket/
