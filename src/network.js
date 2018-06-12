@@ -67,7 +67,10 @@ module.exports = class NetworkWrapper {
       // try to resolve it from local cache
       const node = this._buckets
         .filter(bucket => bucket._id === bucketID)
-        .map(bucket => bucket.node_cache)[0]
+        .map(bucket => {
+          return typeof bucket.node === 'object' ? bucket.node : bucket.node_cache
+        })[0]
+
       // if found, return it
       if (node && node.endpoints) {
         return resolve(node.endpoints.web)
@@ -82,7 +85,8 @@ module.exports = class NetworkWrapper {
       }).then((res) => {
         const bucket = res.data
         this._buckets.push(bucket)
-        return resolve(bucket.node_cache.endpoints.web)
+        const node = typeof bucket.node === 'object' ? bucket.node : bucket.node_cache
+        return resolve(node.endpoints.web)
       }).catch(reject)
     })
   }
@@ -266,7 +270,8 @@ module.exports = class NetworkWrapper {
           let bucket = res.data
           let connected = false
 
-          let endpoint = bucket.node_cache.endpoints.realtime || bucket.node_cache.endpoints.web
+          const endpoints = bucket.node.endpoints || bucket.node_cache.endpoints
+          let endpoint = endpoints.realtime || endpoints.web
           endpoint = endpoint.replace('http', 'ws')
           if (this.opts.IS_DEBUG) {
             endpoint = endpoint.replace(':3000', ':4020')
@@ -280,6 +285,7 @@ module.exports = class NetworkWrapper {
 
           let keepAliveHandler = function () {
             socket.send(`primus::pong::${Date.now()}`)
+            socket.ping()
           }
           let keepAliveInterval = null
 
