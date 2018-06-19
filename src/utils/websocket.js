@@ -78,7 +78,7 @@ ReconnectableWebSocket.prototype.send = function (data) {
 
 ReconnectableWebSocket.prototype.ping = function () {
   debug('ping')
-  if (this._socket && this._socket.readyState === _WebSocket.OPEN && this._messageQueue.length === 0) {
+  if (this._socket.ping && this._socket && this._socket.readyState === _WebSocket.OPEN && this._messageQueue.length === 0) {
     this._socket.ping()
   }
 }
