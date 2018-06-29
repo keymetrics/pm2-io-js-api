@@ -18,7 +18,11 @@ const AuthStrategy = class AuthStrategy {
       optsOauthEndpoint = opts.services.OAUTH || opts.services.API
     }
     const oauthEndpoint = constants.services.OAUTH || constants.services.API
-    this.oauth_endpoint = `${optsOauthEndpoint || oauthEndpoint}${constants.OAUTH_AUTHORIZE_ENDPOINT}`
+    this.oauth_endpoint = `${optsOauthEndpoint || oauthEndpoint}`
+    if (this.oauth_endpoint[this.oauth_endpoint.length - 1] === '/' && constants.OAUTH_AUTHORIZE_ENDPOINT[0] === '/') {
+      this.oauth_endpoint = this.oauth_endpoint.substr(0, this.oauth_endpoint.length - 1)
+    }
+    this.oauth_endpoint += constants.OAUTH_AUTHORIZE_ENDPOINT
     this.oauth_query = `?client_id=${opts.client_id}&response_mode=${this.response_mode}` +
       `&response_type=token&scope=${this.scope}`
   }
