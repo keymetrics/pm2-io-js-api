@@ -21,7 +21,9 @@ module.exports = class Endpoint {
           .then((opts) => {
             // Different service than default, setup base url in url
             if (endpoint.service && endpoint.service.baseURL) {
-              opts.url = endpoint.service.baseURL + opts.url
+              let base = endpoint.service.baseURL
+              base = base[base.length - 1] === '/' ? base.substr(0, base.length - 1) : base
+              opts.url = base + opts.url
             }
             http.request(opts).then(resolve, reject)
           })
