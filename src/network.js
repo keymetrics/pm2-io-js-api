@@ -190,6 +190,8 @@ module.exports = class NetworkWrapper {
   _updateTokens (err, data, cb) {
     if (err) {
       console.error(`Error while retrieving tokens : ${err.message}`)
+      // Try to logout/login user
+      this.oauth_flow.deleteTokens(this.km)
       return console.error(err.response ? err.response.data : err.stack)
     }
     if (!data || !data.access_token || !data.refresh_token) throw new Error('Invalid tokens')
