@@ -23,10 +23,10 @@ module.exports = class NetworkWrapper {
       access_token: null
     }
     this.km = km
-    this._buckets = []
     this._queue = []
     this._axios = axios.create(opts)
     this._websockets = []
+    this._endpoints = new Map()
 
     this.realtime = new EventEmitter({
       wildcard: true,
@@ -63,32 +63,29 @@ module.exports = class NetworkWrapper {
    */
   _resolveBucketEndpoint (bucketID) {
     if (!bucketID) return Promise.reject(new Error(`Missing argument : bucketID`))
-    return new Promise((resolve, reject) => {
-      // try to resolve it from local cache
-      const node = this._buckets
-        .filter(bucket => bucket._id === bucketID)
-        .map(bucket => {
-          return typeof bucket.node === 'object' ? bucket.node : bucket.node_cache
-        })[0]
 
-      // if found, return it
-      if (node && node.endpoints) {
-        return resolve(node.endpoints.web)
-      }
-      // otherwise we will need to resolve where the bucket is hosted
-      this._axios.request({
+    if (!this._endpoints.has(bucketID)) {
+      const promise = this._axios.request({
         url: `/api/bucket/${bucketID}`,
         method: 'GET',
         headers: {
           Authorization: `Bearer ${this.tokens.access_token}`
         }
-      }).then((res) => {
-        const bucket = res.data
-        this._buckets.push(bucket)
-        const node = typeof bucket.node === 'object' ? bucket.node : bucket.node_cache
-        return resolve(node.endpoints.web)
-      }).catch(reject)
-    })
+      })
+        .then((res) => {
+          const bucket = res.data
+          const node = typeof bucket.node === 'object' ? bucket.node : bucket.node_cache
+          return node.endpoints.web
+        })
+        .catch((e) => {
+          this._endpoints.delete(bucketID)
+          throw e
+        })
+
+      this._endpoints.set(bucketID, promise)
+    }
+
+    return this._endpoints.get(bucketID)
   }
 
   /**
@@ -207,7 +204,6 @@ module.exports = class NetworkWrapper {
         Authorization: `Bearer ${data.access_token}`
       }
     }).then((res) => {
-      this._buckets = res.data
       loggerHttp(`Cached ${res.data.length} buckets for current user`)
       this.authenticated = true
       this._queueUpdater()
