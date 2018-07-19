@@ -188,9 +188,15 @@ client.auth.retrieveToken -> POST /api/oauth/token
 client.auth.requestNewPassword -> POST /api/oauth/reset_password
 client.auth.register -> GET /api/oauth/register
 client.auth.revoke -> POST /api/oauth/revoke
+client.bucket.alert.create -> POST /api/bucket/:id/alerts
+client.bucket.alert.delete -> DELETE /api/bucket/:id/alerts/:alert
+client.bucket.alert.list -> GET /api/bucket/:id/alerts/
+client.bucket.alert.updateAlert -> PUT /api/bucket/:id/alerts/:alert
 client.bucket.alert.update -> POST /api/bucket/:id/alerts/update
 client.bucket.alert.updateSlack -> POST /api/bucket/:id/alerts/updateSlack
 client.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
+client.bucket.alert.analyzer.list -> POST /api/bucket/:id/alerts/analyzer
+client.bucket.alert.analyzer.editState -> PUT /api/bucket/:id/alerts/analyzer/:alert
 client.misc.retrievePM2Version -> GET /api/misc/release/pm2
 client.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
 client.misc.retrievePlans -> GET /api/misc/plans
