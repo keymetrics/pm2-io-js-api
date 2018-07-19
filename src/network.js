@@ -163,6 +163,7 @@ module.exports = class NetworkWrapper {
                   if (err) return next(response)
                   // then we can rebuffer the request
                   loggerHttp(`Re-buffering call to ${httpOpts.url} since authenticated now`)
+                  httpOpts.headers.Authorization = `Bearer ${this.tokens.access_token}`
                   return this._axios.request(httpOpts).then(successNext).catch(next)
                 })
               })
