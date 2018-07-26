@@ -28,6 +28,8 @@ module.exports = class NetworkWrapper {
     this._websockets = []
     this._endpoints = new Map()
 
+    this.apiDateLag = 0
+
     this.realtime = new EventEmitter({
       wildcard: true,
       delimiter: ':',
@@ -37,6 +39,33 @@ module.exports = class NetworkWrapper {
     this.realtime.subscribe = this.subscribe.bind(this)
     this.realtime.unsubscribe = this.unsubscribe.bind(this)
     this.authenticated = false
+    this._setupDateLag()
+  }
+
+  _setupDateLag () {
+    const updateApiDateLag = response => {
+      if (response && response.headers && response.headers.date) {
+        const headerDate = new Date(response.headers.date)
+        const clientDate = new Date()
+
+        // The header date is likely to be truncated to the second, so truncate the client date too
+        headerDate.setMilliseconds(0)
+        clientDate.setMilliseconds(0)
+
+        this.apiDateLag = headerDate - clientDate
+      }
+    }
+
+    this._axios.interceptors.response.use(
+      response => {
+        updateApiDateLag(response)
+        return response
+      },
+      error => {
+        updateApiDateLag(error.response)
+        return Promise.reject(error)
+      }
+    )
   }
 
   _queueUpdater () {

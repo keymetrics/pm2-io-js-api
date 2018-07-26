@@ -61,6 +61,18 @@ const Keymetrics = class Keymetrics {
     }
     return this
   }
+
+  /**
+   * API date lag, in millisecond.  This is the difference between the current browser date and the
+   * approximated API date.  This is useful to compute duration between dates returned by the API
+   * and "now".
+   * @example
+   * const apiDate = moment().add(km.apiDateLag)
+   * const timeSinceLastUpdate = apiDate.diff(server.updated_at)
+   */
+  get apiDateLag () {
+    return this._network.apiDateLag
+  }
 }
 
 module.exports = Keymetrics
