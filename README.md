@@ -223,6 +223,41 @@ client.bucket.billing.updateMetadata -> PUT /api/bucket/:id/payment
 client.bucket.deleteServer -> POST /api/bucket/:id/data/deleteServer
 ```
 
+## Local Backend
+
+- Create token in user setting then:
+
+### Standalone logging
+
+```javascript
+const PM2IO = require('@pm2/js-api')
+
+let io = new PM2IO({
+  services: {
+    API: 'http://cl1.km.io:3000',
+    OAUTH: 'http://cl1.km.io:3100'
+  }
+}).use('standalone', {
+  refresh_token: 'refresh-token'
+})
+```
+
+### Browser logging
+
+```javascript
+const PM2IO = require('@pm2/js-api')
+
+let io = new PM2IO({
+  OAUTH_CLIENT_ID: '5413907556',
+  services: {
+    API: 'http://cl1.km.io:3000',
+    OAUTH: 'http://cl1.km.io:3100'
+  }
+}).use('standalone', {
+  refresh_token: 'refresh-token'
+})
+```
+
 ## Tasks
 
 ```
@@ -247,19 +282,19 @@ To release a new version, first install [gren](https://github.com/github-tools/g
 yarn global add github-release-notes
 ```
 
-Push a commit in github with the new version you want to release : 
+Push a commit in github with the new version you want to release :
 ```
 git commit -am "version: major|minor|patch bump to X.X.X"
 ```
 
 Care for the **versionning**, we use the [semver versioning](https://semver.org/) currently. Please be careful about the version when pushing a new package.
 
-Then tag a version with git : 
+Then tag a version with git :
 ```bash
 git tag -s vX.X.X
 ```
 
-Push the tag into github (this will trigger the publish to npm) : 
+Push the tag into github (this will trigger the publish to npm) :
 ```
 git push origin vX.X.X
 ```
