@@ -126,6 +126,7 @@ client.user.setDefaultCard -> POST /api/users/payment/card/:card_id/default
 client.user.fetchMetadata -> GET /api/users/payment/card/stripe_metadata
 client.user.updateMetadata -> PUT /api/users/payment/stripe_metadata
 client.user.update -> POST /api/users/update
+client.user.delete -> DELETE /api/users/delete
 client.bucket.sendFeedback -> PUT /api/bucket/:id/feedback
 client.bucket.retrieveUsers -> GET /api/bucket/:id/users_authorized
 client.bucket.currentRole -> GET /api/bucket/:id/current_role
@@ -146,9 +147,12 @@ client.bucket.destroy -> DELETE /api/bucket/:id
 client.bucket.transferOwnership -> POST /api/bucket/:id/transfer_ownership
 client.bucket.retrieveCharges -> GET /api/bucket/:id/payment/charges
 client.data.status.retrieve -> GET /api/bucket/:id/data/status
-client.data.heapdump.retrieve -> GET /api/bucket/:id/data/heapdump/:filename
+client.data.profiling.retrieve -> GET /api/bucket/:id/data/profilings/:filename
+client.data.profiling.download -> GET /api/bucket/:id/data/profilings/:filename/download
+client.data.profiling.list -> POST /api/bucket/:id/data/profilings
+client.data.profiling.delete -> GET /api/bucket/:id/data/profilings/:filename
 client.data.events.retrieve -> POST /api/bucket/:id/data/events
-client.data.events.retrieveMetadatas -> GET /api/bucket/:id/data/events/eventsKeysByApp
+client.data.events.retrieveMetadatas -> GET /api/bucket/:id/data/eventsKeysByApp
 client.data.events.retrieveHistogram -> POST /api/bucket/:id/data/events/stats
 client.data.events.deleteAll -> DELETE /api/bucket/:id/data/events/delete_all
 client.data.exceptions.retrieve -> POST /api/bucket/:id/data/exceptions
@@ -192,11 +196,13 @@ client.bucket.alert.create -> POST /api/bucket/:id/alerts
 client.bucket.alert.delete -> DELETE /api/bucket/:id/alerts/:alert
 client.bucket.alert.list -> GET /api/bucket/:id/alerts/
 client.bucket.alert.updateAlert -> PUT /api/bucket/:id/alerts/:alert
+client.bucket.alert.triggerSample -> POST /api/bucket/:id/alerts/:alert/sample
 client.bucket.alert.update -> POST /api/bucket/:id/alerts/update
 client.bucket.alert.updateSlack -> POST /api/bucket/:id/alerts/updateSlack
 client.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
 client.bucket.alert.analyzer.list -> POST /api/bucket/:id/alerts/analyzer
 client.bucket.alert.analyzer.editState -> PUT /api/bucket/:id/alerts/analyzer/:alert
+client.bucket.alert.analyzer.updateConfig -> PUT /api/bucket/:id/alerts/analyzer/:analyzer/config
 client.misc.retrievePM2Version -> GET /api/misc/release/pm2
 client.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
 client.misc.retrievePlans -> GET /api/misc/plans
