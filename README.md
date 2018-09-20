@@ -150,7 +150,7 @@ client.data.status.retrieve -> GET /api/bucket/:id/data/status
 client.data.profiling.retrieve -> GET /api/bucket/:id/data/profilings/:filename
 client.data.profiling.download -> GET /api/bucket/:id/data/profilings/:filename/download
 client.data.profiling.list -> POST /api/bucket/:id/data/profilings
-client.data.profiling.delete -> GET /api/bucket/:id/data/profilings/:filename
+client.data.profiling.delete -> DELETE /api/bucket/:id/data/profilings/:filename
 client.data.events.retrieve -> POST /api/bucket/:id/data/events
 client.data.events.retrieveMetadatas -> GET /api/bucket/:id/data/eventsKeysByApp
 client.data.events.retrieveHistogram -> POST /api/bucket/:id/data/events/stats
