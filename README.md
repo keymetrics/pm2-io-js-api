@@ -226,6 +226,9 @@ client.bucket.billing.deleteCreditCard -> DELETE /api/bucket/:id/payment/card/:c
 client.bucket.billing.setDefaultCard -> POST /api/bucket/:id/payment/card/:card_id/default
 client.bucket.billing.fetchMetadata -> GET /api/bucket/:id/payment
 client.bucket.billing.updateMetadata -> PUT /api/bucket/:id/payment
+client.bucket.billing.attachBankAccount -> POST /api/bucket/:id/payment/banks
+client.bucket.billing.fetchBankAccount -> GET /api/bucket/:id/payment/banks
+client.bucket.billing.deleteBankAccount -> DELETE /api/bucket/:id/payment/banks
 client.bucket.deleteServer -> POST /api/bucket/:id/data/deleteServer
 ```
 
