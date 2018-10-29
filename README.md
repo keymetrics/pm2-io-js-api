@@ -170,6 +170,7 @@ client.data.processes.retrieveDeployments -> POST /api/bucket/:id/data/processEv
 client.data.metrics.retrieveAggregations -> POST /api/bucket/:id/data/metrics/aggregations
 client.data.metrics.retrieveHistogram -> POST /api/bucket/:id/data/metrics/histogram
 client.data.metrics.retrieveMetadatas -> POST /api/bucket/:id/data/metrics
+client.data.metrics.retrieveList -> POST /api/bucket/:id/data/metrics/list
 client.data.transactions.retrieveHistogram -> POST /api/bucket/:id/data/transactions/v2/histogram
 client.data.transactions.retrieveSummary -> POST /api/bucket/:id/data/transactions/v2/summary
 client.data.transactions.delete -> POST /api/bucket/:id/data/transactions/v2/delete
