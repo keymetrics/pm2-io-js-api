@@ -204,6 +204,11 @@ client.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
 client.bucket.alert.analyzer.list -> POST /api/bucket/:id/alerts/analyzer
 client.bucket.alert.analyzer.editState -> PUT /api/bucket/:id/alerts/analyzer/:alert
 client.bucket.alert.analyzer.updateConfig -> PUT /api/bucket/:id/alerts/analyzer/:analyzer/config
+client.bucket.webcheck.list -> GET /api/bucket/:id/webchecks
+client.bucket.webcheck.get -> GET /api/bucket/:id/webchecks/:webcheck
+client.bucket.webcheck.create -> POST /api/bucket/:id/webchecks
+client.bucket.webcheck.update -> PUT /api/bucket/:id/webchecks/:webcheck
+client.bucket.webcheck.delete -> DELETE /api/bucket/:id/webchecks/:webcheck
 client.misc.retrievePM2Version -> GET /api/misc/release/pm2
 client.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
 client.misc.retrievePlans -> GET /api/misc/plans
