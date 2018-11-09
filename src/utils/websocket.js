@@ -12,10 +12,10 @@ const defaultOptions = {
   automaticOpen: true,
   reconnectOnError: true,
   reconnectInterval: 1000,
-  maxReconnectInterval: 30000,
+  maxReconnectInterval: 10000,
   reconnectDecay: 1,
   timeoutInterval: 2000,
-  maxReconnectAttempts: 5,
+  maxReconnectAttempts: Infinity,
   randomRatio: 3,
   reconnectOnCleanClose: false
 }
