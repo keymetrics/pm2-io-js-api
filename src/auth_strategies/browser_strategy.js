@@ -52,15 +52,16 @@ module.exports = class BrowserFlow extends AuthStrategy {
     return new Promise((resolve, reject) => {
       // revoke the refreshToken
       km.auth.revoke()
-      .then(res => {
-        // remove the token from the localStorage
-        localStorage.removeItem('km_refresh_token')
-        setTimeout(_ => {
-          // redirect after few miliseconds so any user code will run
-          window.location = `${this.oauth_endpoint}${this.oauth_query}`
-        }, 500)
-        return resolve(res)
-      }).catch(reject)
+        .then(res => console.log('Token successfuly revoked!'))
+        .catch(err => console.error(`Error when trying to revoke token: ${err.message}`))
+      // We need to remove from storage and redirect user in every case (cf. https://github.com/keymetrics/pm2-io-js-api/issues/49)
+      // remove the token from the localStorage
+      localStorage.removeItem('km_refresh_token')
+      setTimeout(_ => {
+        // redirect after few miliseconds so any user code will run
+        window.location = `${this.oauth_endpoint}${this.oauth_query}`
+      }, 500)
+      return resolve()
     })
   }
 }
