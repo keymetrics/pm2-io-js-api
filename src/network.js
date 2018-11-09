@@ -226,6 +226,7 @@ module.exports = class NetworkWrapper {
     this.tokens = data
 
     loggerHttp(`Registered new access_token : ${data.access_token}`)
+    this._websockets.forEach(websocket => websocket.updateAuthorization(data.access_token))
     this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
     this._axios.request({
       url: '/api/bucket',
@@ -307,7 +308,11 @@ module.exports = class NetworkWrapper {
           loggerWS(`Found endpoint for ${bucketId} : ${endpoint}`)
 
           // connect websocket client to the realtime endpoint
-          let socket = new WS(`${endpoint}/primus/?token=${this.tokens.access_token}`)
+          let socket = new WS(`${endpoint}`, {
+            headers: {
+              Authorization: this.tokens.access_token
+            }
+          })
           socket.connected = false
           socket.bucket = bucketId
 

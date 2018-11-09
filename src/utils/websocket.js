@@ -47,6 +47,11 @@ const ReconnectableWebSocket = function (url, protocols, options) {
   if (this._options.automaticOpen) this.open()
 }
 
+ReconnectableWebSocket.prototype.updateAuthorization = function (authorization) {
+  if (!this._protocols.headers) this._protocols.headers = {}
+  this._protocols.headers.authorization = authorization
+}
+
 ReconnectableWebSocket.prototype.open = function () {
   debug('open')
   var socket = this._socket = new _WebSocket(this._url, this._protocols)
