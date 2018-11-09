@@ -66,6 +66,7 @@ ReconnectableWebSocket.prototype.open = function () {
 
   this._syncState()
 
+  socket.on('unexpected-response', this._onunexpectedresponse)
   socket.onmessage = this._onmessage.bind(this)
   socket.onopen = this._onopen.bind(this)
   socket.onclose = this._onclose.bind(this)
@@ -93,6 +94,11 @@ ReconnectableWebSocket.prototype.close = function (code, reason) {
   if (typeof code === 'undefined') code = 1000
 
   if (this._socket) this._socket.close(code, reason)
+}
+
+ReconnectableWebSocket.prototype._onunexpectedresponse = function (req, res) {
+  debug('unexpected-response')
+  this.onunexpectedresponse && this.onunexpectedresponse(req, res)
 }
 
 ReconnectableWebSocket.prototype._onmessage = function (message) {

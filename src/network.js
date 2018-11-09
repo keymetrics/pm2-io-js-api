@@ -317,7 +317,6 @@ module.exports = class NetworkWrapper {
           socket.bucket = bucketId
 
           let keepAliveHandler = function () {
-            socket.send(`primus::pong::${Date.now()}`)
             socket.ping()
           }
           let keepAliveInterval = null
@@ -351,6 +350,19 @@ module.exports = class NetworkWrapper {
           socket.onopen = onConnect
           socket.onreconnect = onConnect
 
+          socket.onunexpectedresponse = (req, res) => {
+            if (res.statusCode === 401) {
+              return this.oauth_flow.retrieveTokens(this.km, (err, data) => {
+                if (err) return logger(`Failed to retrieve tokens for ws: ${err.message}`)
+                logger(`Succesfully retrieved new tokens for ws`)
+                this._updateTokens(null, data, (err, authenticated) => {
+                  if (err) return logger(`Failed to update tokens for ws: ${err.message}`)
+                  return socket._tryReconnect()
+                })
+              })
+            }
+            return socket._tryReconnect()
+          }
           socket.onerror = (err) => {
             loggerWS(`Error on ${endpoint} (bucket: ${bucketId})`)
             loggerWS(err)
