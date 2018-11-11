@@ -1,6 +1,6 @@
 {
   "name": "@pm2/js-api",
-  "version": "0.5.30",
+  "version": "0.5.31",
   "description": "PM2.io API Client for Javascript",
   "main": "index.js",
   "engines": {
