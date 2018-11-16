@@ -308,11 +308,7 @@ module.exports = class NetworkWrapper {
           loggerWS(`Found endpoint for ${bucketId} : ${endpoint}`)
 
           // connect websocket client to the realtime endpoint
-          let socket = new WS(`${endpoint}`, {
-            headers: {
-              Authorization: this.tokens.access_token
-            }
-          })
+          let socket = new WS(`${endpoint}/primus`, this.tokens.access_token)
           socket.connected = false
           socket.bucket = bucketId
 

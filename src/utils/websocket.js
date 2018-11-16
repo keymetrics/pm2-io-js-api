@@ -20,7 +20,7 @@ const defaultOptions = {
   reconnectOnCleanClose: false
 }
 
-const ReconnectableWebSocket = function (url, protocols, options) {
+const ReconnectableWebSocket = function (url, token, protocols, options) {
   if (!protocols) protocols = []
   if (!options) options = []
 
@@ -30,6 +30,7 @@ const ReconnectableWebSocket = function (url, protocols, options) {
   this.CLOSED = 3
 
   this._url = url
+  this._token = token
   this._protocols = protocols
   this._options = Object.assign({}, defaultOptions, options)
   this._messageQueue = []
@@ -48,13 +49,12 @@ const ReconnectableWebSocket = function (url, protocols, options) {
 }
 
 ReconnectableWebSocket.prototype.updateAuthorization = function (authorization) {
-  if (!this._protocols.headers) this._protocols.headers = {}
-  this._protocols.headers.authorization = authorization
+  this._token = authorization
 }
 
 ReconnectableWebSocket.prototype.open = function () {
   debug('open')
-  var socket = this._socket = new _WebSocket(this._url, this._protocols)
+  var socket = this._socket = new _WebSocket(`${this._url}?token=${this._token}`, this._protocols)
 
   if (this._options.binaryType) {
     socket.binaryType = this._options.binaryType
@@ -66,7 +66,9 @@ ReconnectableWebSocket.prototype.open = function () {
 
   this._syncState()
 
-  socket.on('unexpected-response', this._onunexpectedresponse)
+  if (socket.on) {
+    socket.on('unexpected-response', this._onunexpectedresponse)
+  }
   socket.onmessage = this._onmessage.bind(this)
   socket.onopen = this._onopen.bind(this)
   socket.onclose = this._onclose.bind(this)
@@ -165,7 +167,6 @@ ReconnectableWebSocket.prototype._flushQueue = function () {
 ReconnectableWebSocket.prototype._getTimeout = function () {
   var timeout = this._options.reconnectInterval * Math.pow(this._options.reconnectDecay, this._reconnectAttempts)
   timeout = timeout > this._options.maxReconnectInterval ? this._options.maxReconnectInterval : timeout
-  console.log(timeout)
   return this._options.randomRatio ? getRandom(timeout / this._options.randomRatio, timeout) : timeout
 }
 
