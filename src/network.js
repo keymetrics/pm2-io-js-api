@@ -344,7 +344,6 @@ module.exports = class NetworkWrapper {
             }
           }
           socket.onopen = onConnect
-          socket.onreconnect = onConnect
 
           socket.onunexpectedresponse = (req, res) => {
             if (res.statusCode === 401) {
