@@ -3,7 +3,7 @@ const pkg = require('./package.json')
 
 const config = {
   headers: {
-    'User-Agent': `PM2 js-api v${pkg.version}`
+    'X-JS-API-Version': pkg.version
   },
   services: {
     API: 'https://app.keymetrics.io',
