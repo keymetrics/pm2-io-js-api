@@ -228,6 +228,8 @@ client.user.otp.disable -> DELETE /api/users/otp
 client.user.providers.retrieve -> GET /api/users/integrations
 client.user.providers.add -> POST /api/users/integrations
 client.user.providers.remove -> DELETE /api/users/integrations/:name
+client.bucket.webcheck.listRegions -> GET /api/bucket/:id/webchecks/regions
+client.bucket.webcheck.getMetrics -> GET /api/bucket/:id/webchecks/:webcheck/metrics
 client.bucket.webcheck.list -> GET /api/bucket/:id/webchecks
 client.bucket.webcheck.get -> GET /api/bucket/:id/webchecks/:webcheck
 client.bucket.webcheck.create -> POST /api/bucket/:id/webchecks
