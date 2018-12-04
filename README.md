@@ -140,6 +140,7 @@ client.bucket.alert.create -> POST /api/bucket/:id/alerts
 client.bucket.alert.delete -> DELETE /api/bucket/:id/alerts/:alert
 client.bucket.alert.list -> GET /api/bucket/:id/alerts/
 client.bucket.alert.updateAlert -> PUT /api/bucket/:id/alerts/:alert
+client.bucket.alert.get -> GET /api/bucket/:id/alerts/:alert
 client.bucket.alert.analyzer.list -> POST /api/bucket/:id/alerts/analyzer
 client.bucket.alert.analyzer.editState -> PUT /api/bucket/:id/alerts/analyzer/:alert
 client.bucket.alert.analyzer.updateConfig -> PUT /api/bucket/:id/alerts/analyzer/:analyzer/config
