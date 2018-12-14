@@ -132,7 +132,6 @@ client.bucket.destroy -> DELETE /api/bucket/:id
 client.bucket.transferOwnership -> POST /api/bucket/:id/transfer_ownership
 client.bucket.retrieveCharges -> GET /api/bucket/:id/payment/charges
 client.bucket.updateUserOptions -> PUT /api/bucket/:id/user_options
-client.bucket.alert.triggerSample -> POST /api/bucket/:id/alerts/:alert/sample
 client.bucket.alert.update -> POST /api/bucket/:id/alerts/update
 client.bucket.alert.updateSlack -> POST /api/bucket/:id/alerts/updateSlack
 client.bucket.alert.updateWebhooks -> POST /api/bucket/:id/alerts/updateWebhooks
@@ -141,6 +140,7 @@ client.bucket.alert.delete -> DELETE /api/bucket/:id/alerts/:alert
 client.bucket.alert.list -> GET /api/bucket/:id/alerts/
 client.bucket.alert.updateAlert -> PUT /api/bucket/:id/alerts/:alert
 client.bucket.alert.get -> GET /api/bucket/:id/alerts/:alert
+client.bucket.alert.triggerSample -> POST /api/bucket/:id/alerts/:alert/sample
 client.bucket.alert.analyzer.list -> POST /api/bucket/:id/alerts/analyzer
 client.bucket.alert.analyzer.editState -> PUT /api/bucket/:id/alerts/analyzer/:alert
 client.bucket.alert.analyzer.updateConfig -> PUT /api/bucket/:id/alerts/analyzer/:analyzer/config
@@ -229,8 +229,9 @@ client.user.otp.disable -> DELETE /api/users/otp
 client.user.providers.retrieve -> GET /api/users/integrations
 client.user.providers.add -> POST /api/users/integrations
 client.user.providers.remove -> DELETE /api/users/integrations/:name
+client.bucket.webcheck.listMetrics -> GET /api/bucket/:id/webchecks/metrics
 client.bucket.webcheck.listRegions -> GET /api/bucket/:id/webchecks/regions
-client.bucket.webcheck.getMetrics -> GET /api/bucket/:id/webchecks/:webcheck/metrics
+client.bucket.webcheck.getMetrics -> POST /api/bucket/:id/webchecks/:webcheck/metrics
 client.bucket.webcheck.list -> GET /api/bucket/:id/webchecks
 client.bucket.webcheck.get -> GET /api/bucket/:id/webchecks/:webcheck
 client.bucket.webcheck.create -> POST /api/bucket/:id/webchecks
@@ -240,6 +241,9 @@ client.auth.retrieveToken -> POST /api/oauth/token
 client.auth.requestNewPassword -> POST /api/oauth/reset_password
 client.auth.register -> GET /api/oauth/register
 client.auth.revoke -> POST /api/oauth/revoke
+client.data.traces.list -> POST /api/bucket/:id/data/traces
+client.data.traces.retrieve -> GET /api/bucket/:id/data/traces/:trace
+client.data.traces.getServices -> GET /api/bucket/:id/data/traces/services
 ```
 
 ## Local Backend
