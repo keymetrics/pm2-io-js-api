@@ -239,6 +239,8 @@ client.bucket.webcheck.update -> PUT /api/bucket/:id/webchecks/:webcheck
 client.bucket.webcheck.delete -> DELETE /api/bucket/:id/webchecks/:webcheck
 client.auth.retrieveToken -> POST /api/oauth/token
 client.auth.requestNewPassword -> POST /api/oauth/reset_password
+client.auth.sendEmailLink -> POST /api/oauth/send_email_link
+client.auth.validEmail -> POST /api/oauth/valid_email/:token
 client.auth.register -> GET /api/oauth/register
 client.auth.revoke -> POST /api/oauth/revoke
 client.data.traces.list -> POST /api/bucket/:id/data/traces
