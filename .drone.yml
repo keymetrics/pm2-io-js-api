@@ -16,7 +16,7 @@ pipeline:
       event: [ push ]
   slack:
     image: plugins/slack
-    channel: ci
+    channel: dev-stream-ci
     template: |
       {{#success build.status}}
         {{ repo.name }} : commit {{ build.commit }} on branch "{{ build.branch}}" with node:${NODE_VERSION} done by {{ build.author}} succeeded.
