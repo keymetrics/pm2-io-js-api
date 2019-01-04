@@ -2,9 +2,9 @@ pipeline:
   tests:
     image: node:${NODE_VERSION}
     commands:
-      - npm install 2> /dev/null
+      - yarn 2> /dev/null
       - export NODE_ENV=test
-      - npm run test
+      - yarn run test
     secrets: [ keymetrics_token ]
     when:
       event: [ push ]
@@ -31,10 +31,10 @@ pipeline:
   build:
     image: node:8
     commands:
-      - npm install 2> /dev/null
+      - yarn 2> /dev/null
       - mkdir dist
-      - npm run build
-      - npm run dist
+      - yarn run build
+      - yarn run dist
     when:
       event: [ tag ]
   publish_npm:
