@@ -16,8 +16,9 @@ const BUFFERIZED = -1
 module.exports = class NetworkWrapper {
   constructor (km, opts) {
     logger('init network manager')
-    opts.baseURL = opts.services.API || 'https://api.keymetrics.io'
+    opts.baseURL = opts.services.API
     this.opts = opts
+    this.opts.maxRedirects = 0
     this.tokens = {
       refresh_token: null,
       access_token: null
