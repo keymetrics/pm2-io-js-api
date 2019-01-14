@@ -190,6 +190,7 @@ client.data.profiling.download -> GET /api/bucket/:id/data/profilings/:filename/
 client.data.profiling.list -> POST /api/bucket/:id/data/profilings
 client.data.profiling.delete -> DELETE /api/bucket/:id/data/profilings/:filename
 client.data.status.retrieve -> GET /api/bucket/:id/data/status
+client.data.status.retrieveBlacklisted -> GET /api/bucket/:id/data/status/blacklisted
 client.data.transactions.retrieveHistogram -> POST /api/bucket/:id/data/transactions/v2/histogram
 client.data.transactions.retrieveSummary -> POST /api/bucket/:id/data/transactions/v2/summary
 client.data.transactions.delete -> POST /api/bucket/:id/data/transactions/v2/delete
@@ -240,7 +241,7 @@ client.bucket.webcheck.delete -> DELETE /api/bucket/:id/webchecks/:webcheck
 client.auth.retrieveToken -> POST /api/oauth/token
 client.auth.requestNewPassword -> POST /api/oauth/reset_password
 client.auth.sendEmailLink -> POST /api/oauth/send_email_link
-client.auth.validEmail -> POST /api/oauth/valid_email/:token
+client.auth.validEmail -> GET /api/oauth/valid_email/:token
 client.auth.register -> GET /api/oauth/register
 client.auth.revoke -> POST /api/oauth/revoke
 client.data.traces.list -> POST /api/bucket/:id/data/traces
