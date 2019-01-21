@@ -247,6 +247,8 @@ client.auth.revoke -> POST /api/oauth/revoke
 client.data.traces.list -> POST /api/bucket/:id/data/traces
 client.data.traces.retrieve -> GET /api/bucket/:id/data/traces/:trace
 client.data.traces.getServices -> GET /api/bucket/:id/data/traces/services
+client.data.notifications.list -> POST /api/bucket/:id/data/notifications
+client.data.notifications.retrieve -> GET /api/bucket/:id/data/notifications/:notification
 ```
 
 ## Local Backend
