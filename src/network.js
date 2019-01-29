@@ -37,6 +37,18 @@ module.exports = class NetworkWrapper {
       newListener: false,
       maxListeners: 20
     })
+    // https://github.com/EventEmitter2/EventEmitter2/issues/214
+    const self = this
+    const realtimeOn = this.realtime.on
+    this.realtime.on = function () {
+      self.editSocketFilters('push', arguments[0])
+      return realtimeOn.apply(self.realtime, arguments)
+    }
+    const realtimeOff = this.realtime.off
+    this.realtime.off = function () {
+      self.editSocketFilters('remove', arguments[0])
+      return realtimeOff.apply(self.realtime, arguments)
+    }
     this.realtime.subscribe = this.subscribe.bind(this)
     this.realtime.unsubscribe = this.unsubscribe.bind(this)
     this.authenticated = false
@@ -285,6 +297,25 @@ module.exports = class NetworkWrapper {
     return this.oauth_flow.retrieveTokens(this.km, this._updateTokens.bind(this))
   }
 
+  editSocketFilters (type, event) {
+    event = event.split(':')
+    const bucketPublicId = event[0]
+    const filter = event.slice(2).join(':')
+    const socket = this._websockets.find(socket => socket.bucketPublic === bucketPublicId)
+
+    if (!socket) return
+    if (type === 'push') {
+      socket.filters.push(filter)
+    } else {
+      socket.filters.splice(socket.filters.indexOf(filter), 1)
+    }
+    socket.send(JSON.stringify({
+      action: 'sub',
+      public_id: bucketPublicId,
+      filters: Array.from(new Set(socket.filters)) // avoid duplicates
+    }))
+  }
+
   /**
    * Subscribe to realtime from bucket
    * @param {String} bucketId bucket id
@@ -310,6 +341,8 @@ module.exports = class NetworkWrapper {
 
           // connect websocket client to the realtime endpoint
           let socket = new WS(`${endpoint}/primus`, this.tokens.access_token)
+          socket.filters = []
+          socket.bucketPublic = bucket.public_id
           socket.connected = false
           socket.bucket = bucketId
 
@@ -324,8 +357,9 @@ module.exports = class NetworkWrapper {
             this.realtime.emit(`${bucket.public_id}:connected`)
 
             socket.send(JSON.stringify({
-              action: 'active',
-              public_id: bucket.public_id
+              action: 'sub',
+              public_id: bucket.public_id,
+              filters: Array.from(new Set(socket.filters)) // avoid duplicates
             }))
 
             if (keepAliveInterval !== null) {
