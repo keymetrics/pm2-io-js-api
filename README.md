@@ -104,6 +104,32 @@ client.realtime.on(`4398545:my_server:status`, (data) => {
 }
 ```
 
+#### Events available
+
+| Event | Description |
+|-------|-------------|
+| mediator:blacklist | Used to broadcast updated process blacklisted |
+| human:event | Events sent via pmx.emit() |
+| process:exception | Issues from pm2 or apm |
+| logs | Logs |
+| status | Status sent by apm or pm2 |
+| metric | Metric sent by apm/collectors |
+| axm:transaction:outlier | Outlier for transaction tracing |
+| process:event | Event from pm2 (restart...) |
+| profiling | Profiling packet with profiling link |
+| axm:scoped_action:stream | Stream from scoped action |
+| axm:scoped_action:end | End of scoped action |
+| axm:scoped_action:error | Error for a scoped action |
+| pm2:scoped:end | End for pm2 scoped |
+| pm2:scoped:stream | Stream from pm2 scoped |
+| pm2:scoped:error | Error from pm2 scoped |
+| trace-span | Span for distributed tracing |
+| axm:transaction | Transaction for transaction tracing |
+| trigger:pm2:result | Result from a pm2 action |
+| trigger:action:success | Success from a custom action |
+| trigger:action:failure | Error from a customer action |
+| axm:reply | Reply from a custom action |
+
 ## Route definition
 
 ```
