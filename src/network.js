@@ -298,6 +298,7 @@ module.exports = class NetworkWrapper {
   }
 
   editSocketFilters (type, event) {
+    if (event.indexOf('**') === 0) throw new Error('You need to provide a bucket public id.')
     event = event.split(':')
     const bucketPublicId = event[0]
     const filter = event.slice(2).join(':')
