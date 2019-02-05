@@ -275,6 +275,11 @@ client.data.traces.retrieve -> GET /api/bucket/:id/data/traces/:trace
 client.data.traces.getServices -> GET /api/bucket/:id/data/traces/services
 client.data.notifications.list -> POST /api/bucket/:id/data/notifications
 client.data.notifications.retrieve -> GET /api/bucket/:id/data/notifications/:notification
+client.bucket.application.list -> GET /api/bucket/:id/applications
+client.bucket.application.get -> GET /api/bucket/:id/applications/:application
+client.bucket.application.create -> POST /api/bucket/:id/applications
+client.bucket.application.update -> PUT /api/bucket/:id/applications/:application
+client.bucket.application.delete -> DELETE /api/bucket/:id/applications/:application
 ```
 
 ## Local Backend
