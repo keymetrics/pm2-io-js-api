@@ -28,6 +28,7 @@ module.exports = class NetworkWrapper {
     this._axios = axios.create(opts)
     this._websockets = []
     this._endpoints = new Map()
+    this._bucketFilters = new Map()
 
     this.apiDateLag = 0
 
@@ -303,17 +304,20 @@ module.exports = class NetworkWrapper {
     const bucketPublicId = event[0]
     const filter = event.slice(2).join(':')
     const socket = this._websockets.find(socket => socket.bucketPublic === bucketPublicId)
+    if (!this._bucketFilters.has(bucketPublicId)) this._bucketFilters.set(bucketPublicId, [])
+    const filters = this._bucketFilters.get(bucketPublicId)
+
+    if (type === 'push') {
+      filters.push(filter)
+    } else {
+      filters.splice(filters.indexOf(filter), 1)
+    }
 
     if (!socket) return
-    if (type === 'push') {
-      socket.filters.push(filter)
-    } else {
-      socket.filters.splice(socket.filters.indexOf(filter), 1)
-    }
     socket.send(JSON.stringify({
       action: 'sub',
       public_id: bucketPublicId,
-      filters: Array.from(new Set(socket.filters)) // avoid duplicates
+      filters: Array.from(new Set(filters)) // avoid duplicates
     }))
   }
 
@@ -342,7 +346,6 @@ module.exports = class NetworkWrapper {
 
           // connect websocket client to the realtime endpoint
           let socket = new WS(`${endpoint}/primus`, this.tokens.access_token)
-          socket.filters = []
           socket.bucketPublic = bucket.public_id
           socket.connected = false
           socket.bucket = bucketId
@@ -360,7 +363,7 @@ module.exports = class NetworkWrapper {
             socket.send(JSON.stringify({
               action: 'sub',
               public_id: bucket.public_id,
-              filters: Array.from(new Set(socket.filters)) // avoid duplicates
+              filters: Array.from(new Set(this._bucketFilters.get(bucket.public_id))) // avoid duplicates
             }))
 
             if (keepAliveInterval !== null) {
