@@ -10,6 +10,10 @@ With NPM:
 $ npm install @pm2/js-api --save
 ```
 
+Or get the raw library for browser here:
+
+[https://unpkg.com/@pm2/js-api@0.5.49/dist/keymetrics.es5.min.js](https://unpkg.com/@pm2/js-api@0.5.49/dist/keymetrics.es5.min.js)
+
 ## Usage
 
 To use this client you need to first requiring it into your code and creating a new instance :
