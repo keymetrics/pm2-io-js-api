@@ -273,6 +273,8 @@ client.auth.revoke -> POST /api/oauth/revoke
 client.data.traces.list -> POST /api/bucket/:id/data/traces
 client.data.traces.retrieve -> GET /api/bucket/:id/data/traces/:trace
 client.data.traces.getServices -> GET /api/bucket/:id/data/traces/services
+client.data.traces.getTags -> GET /api/bucket/:id/data/traces/tags
+client.data.traces.getHistogramByTag -> POST /api/bucket/:id/data/traces/histogram/tag
 client.data.notifications.list -> POST /api/bucket/:id/data/notifications
 client.data.notifications.retrieve -> GET /api/bucket/:id/data/notifications/:notification
 client.bucket.application.list -> GET /api/bucket/:id/applications
