@@ -1,6 +1,6 @@
 {
   "name": "@pm2/js-api",
-  "version": "0.5.52",
+  "version": "0.5.53",
   "description": "PM2.io API Client for Javascript",
   "main": "index.js",
   "unpkg": "dist/keymetrics.es5.min.js",
