@@ -179,6 +179,7 @@ client.bucket.billing.startTrial -> PUT /api/bucket/:id/payment/trial
 client.bucket.billing.getInvoices -> GET /api/bucket/:id/payment/invoices
 client.bucket.billing.getReceipts -> GET /api/bucket/:id/payment/receipts
 client.bucket.billing.getSubcription -> GET /api/bucket/:id/payment/subscription
+client.bucket.billing.getSubcriptionState -> GET /api/bucket/:id/payment/subscription/state
 client.bucket.billing.attachCreditCard -> POST /api/bucket/:id/payment/cards
 client.bucket.billing.fetchCreditCards -> GET /api/bucket/:id/payment/cards
 client.bucket.billing.fetchCreditCard -> GET /api/bucket/:id/payment/card/:card_id
