@@ -229,6 +229,7 @@ client.dashboard.retrieve -> GET /api/bucket/:id/dashboard/:dashid
 client.dashboard.remove -> DELETE /api/bucket/:id/dashboard/:dashid
 client.dashboard.update -> POST /api/bucket/:id/dashboard/:dashId
 client.dashboard.create -> PUT /api/bucket/:id/dashboard/
+client.misc.listChangelogArticles -> GET /api/misc/changelog
 client.misc.retrievePM2Version -> GET /api/misc/release/pm2
 client.misc.retrieveNodeRelease -> GET /api/misc/release/nodejs/:version
 client.misc.retrievePlans -> GET /api/misc/plans
@@ -277,6 +278,8 @@ client.auth.revoke -> POST /api/oauth/revoke
 client.data.traces.list -> POST /api/bucket/:id/data/traces
 client.data.traces.retrieve -> GET /api/bucket/:id/data/traces/:trace
 client.data.traces.getServices -> GET /api/bucket/:id/data/traces/services
+client.data.traces.getTags -> GET /api/bucket/:id/data/traces/tags
+client.data.traces.getHistogramByTag -> POST /api/bucket/:id/data/traces/histogram/tag
 client.data.notifications.list -> POST /api/bucket/:id/data/notifications
 client.data.notifications.retrieve -> GET /api/bucket/:id/data/notifications/:notification
 client.bucket.application.list -> GET /api/bucket/:id/applications
