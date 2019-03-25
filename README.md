@@ -202,6 +202,7 @@ client.data.exceptions.retrieveSummary -> GET /api/bucket/:id/data/exceptions/su
 client.data.exceptions.deleteAll -> POST /api/bucket/:id/data/exceptions/delete_all
 client.data.exceptions.delete -> POST /api/bucket/:id/data/exceptions/delete
 client.data.issues.retrieve -> POST /api/bucket/:id/data/issues
+client.data.issues.list -> POST /api/bucket/:id/data/issues/list
 client.data.issues.retrieveHistogram -> POST /api/bucket/:id/data/issues/histogram
 client.data.issues.findOccurences -> POST /api/bucket/:id/data/issues/ocurrences
 client.data.issues.search -> POST /api/bucket/:id/data/issues/search
