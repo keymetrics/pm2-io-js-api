@@ -140,8 +140,6 @@ client.realtime.on(`4398545:my_server:status`, (data) => {
 client.actions.triggerAction -> POST /api/bucket/:id/actions/trigger
 client.actions.triggerPM2Action -> POST /api/bucket/:id/actions/triggerPM2
 client.actions.triggerScopedAction -> POST /api/bucket/:id/actions/triggerScopedAction
-client.actions.retrieve -> POST /api/bucket/:id/actions/listScopedActions
-client.actions.remove -> POST /api/bucket/:id/actions/deleteScopedAction
 client.bucket.sendFeedback -> PUT /api/bucket/:id/feedback
 client.bucket.retrieveUsers -> GET /api/bucket/:id/users_authorized
 client.bucket.currentRole -> GET /api/bucket/:id/current_role
@@ -201,8 +199,8 @@ client.data.exceptions.retrieve -> POST /api/bucket/:id/data/exceptions
 client.data.exceptions.retrieveSummary -> GET /api/bucket/:id/data/exceptions/summary
 client.data.exceptions.deleteAll -> POST /api/bucket/:id/data/exceptions/delete_all
 client.data.exceptions.delete -> POST /api/bucket/:id/data/exceptions/delete
-client.data.issues.retrieve -> POST /api/bucket/:id/data/issues
 client.data.issues.list -> POST /api/bucket/:id/data/issues/list
+client.data.issues.listOccurencesForIdentifier -> GET /api/bucket/:id/data/issues/occurrences/:identifier
 client.data.issues.retrieveHistogram -> POST /api/bucket/:id/data/issues/histogram
 client.data.issues.findOccurences -> POST /api/bucket/:id/data/issues/ocurrences
 client.data.issues.search -> POST /api/bucket/:id/data/issues/search
