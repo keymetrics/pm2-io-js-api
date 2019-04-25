@@ -201,9 +201,11 @@ client.data.exceptions.deleteAll -> POST /api/bucket/:id/data/exceptions/delete_
 client.data.exceptions.delete -> POST /api/bucket/:id/data/exceptions/delete
 client.data.issues.list -> POST /api/bucket/:id/data/issues/list
 client.data.issues.listOccurencesForIdentifier -> GET /api/bucket/:id/data/issues/occurrences/:identifier
+client.data.issues.getReplayForOccurrence -> GET /api/bucket/:id/data/issues/occurrence/:occurrence/replay
 client.data.issues.retrieveHistogram -> POST /api/bucket/:id/data/issues/histogram
 client.data.issues.findOccurences -> POST /api/bucket/:id/data/issues/ocurrences
 client.data.issues.search -> POST /api/bucket/:id/data/issues/search
+client.data.issues.summary -> GET /api/bucket/:id/data/issues/summary/:aggregateBy
 client.data.issues.deleteAll -> DELETE /api/bucket/:id/data/issues
 client.data.issues.delete -> DELETE /api/bucket/:id/data/issues/:identifier
 client.data.logs.retrieve -> POST /api/bucket/:id/data/logs
