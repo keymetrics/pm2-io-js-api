@@ -201,7 +201,7 @@ client.data.exceptions.deleteAll -> POST /api/bucket/:id/data/exceptions/delete_
 client.data.exceptions.delete -> POST /api/bucket/:id/data/exceptions/delete
 client.data.issues.list -> POST /api/bucket/:id/data/issues/list
 client.data.issues.listOccurencesForIdentifier -> GET /api/bucket/:id/data/issues/occurrences/:identifier
-client.data.issues.getReplayForOccurrence -> GET /api/bucket/:id/data/issues/occurrence/:occurrence/replay
+client.data.issues.getReplay -> GET /api/bucket/:id/data/issues/replay/:uuid
 client.data.issues.retrieveHistogram -> POST /api/bucket/:id/data/issues/histogram
 client.data.issues.findOccurences -> POST /api/bucket/:id/data/issues/ocurrences
 client.data.issues.search -> POST /api/bucket/:id/data/issues/search
@@ -289,6 +289,8 @@ client.bucket.application.get -> GET /api/bucket/:id/applications/:application
 client.bucket.application.create -> POST /api/bucket/:id/applications
 client.bucket.application.update -> PUT /api/bucket/:id/applications/:application
 client.bucket.application.delete -> DELETE /api/bucket/:id/applications/:application
+client.bucket.application.getPreview -> GET /api/bucket/:id/applications/:application/preview
+client.bucket.application.getReports -> GET /api/bucket/:id/applications/:application/report
 ```
 
 ## Local Backend
