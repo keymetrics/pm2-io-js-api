@@ -116,9 +116,7 @@ module.exports = class NetworkWrapper {
         }
       })
         .then((res) => {
-          const bucket = res.data
-          const node = typeof bucket.node === 'object' ? bucket.node : bucket.node_cache
-          return node.endpoints.web
+          return res.data.node.endpoints.web
         })
         .catch((e) => {
           this._endpoints.delete(bucketID)
@@ -336,7 +334,7 @@ module.exports = class NetworkWrapper {
           let bucket = res.data
           let connected = false
 
-          const endpoints = bucket.node.endpoints || bucket.node_cache.endpoints
+          const endpoints = bucket.node.endpoints
           let endpoint = endpoints.realtime || endpoints.web
           endpoint = endpoint.replace('http', 'ws')
           if (this.opts.IS_DEBUG) {
