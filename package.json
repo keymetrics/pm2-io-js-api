@@ -9,10 +9,11 @@
   },
   "scripts": {
     "test": "mocha test/*",
-    "build": "browserify -s Keymetrics -r ./ > ./dist/keymetrics.es5.js",
-    "dist": "browserify -s Keymetrics -r ./ | uglifyjs -c warnings=false -m > ./dist/keymetrics.es5.min.js",
+    "build": "mkdir -p dist; browserify -s Keymetrics -r ./ > ./dist/keymetrics.es5.js",
+    "dist": "mkdir -p dist; browserify -s Keymetrics -r ./ | uglifyjs -c warnings=false -m > ./dist/keymetrics.es5.min.js",
     "doc": "jsdoc -r ./src --readme ./README.md -d doc -t ./node_modules/minami",
-    "clean": "rm dist/*"
+    "clean": "rm dist/*",
+    "prepublish": "npm run build && npm run dist"
   },
   "repository": {
     "type": "git",
@@ -39,10 +40,10 @@
     "ws": "^3.0.0"
   },
   "devDependencies": {
-    "babel-core": "^6.26.0",
+    "babel-core": "6.26.0",
     "babel-preset-es2015": "*",
-    "babel-preset-stage-2": "*",
-    "babelify": "*",
+    "babel-preset-stage-2": "6.24.1",
+    "babelify": "8.0.0",
     "browserify": "^13.1.0",
     "jsdoc": "^3.4.2",
     "minami": "^1.1.1",
@@ -50,7 +51,7 @@
     "pm2": "latest",
     "should": "*",
     "standard": "^10.0.2",
-    "uglify-js": "*"
+    "uglify-js": "~3.3.7"
   },
   "browserify": {
     "debug": "true",
