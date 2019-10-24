@@ -191,23 +191,31 @@ module.exports = class NetworkWrapper {
               this.authenticated = false
 
               loggerHttp(`Asking to the oauth flow to retrieve new tokens`)
-              this.oauth_flow.retrieveTokens(this.km, (err, data) => {
-                // if it fail, we fail the whole request
-                if (err) {
-                  loggerHttp(`Failed to retrieve new tokens : ${err.message || err}`)
-                  return next(response)
-                }
-                // if its good, we try to update the tokens
-                loggerHttp(`Succesfully retrieved new tokens`)
-                this._updateTokens(null, data, (err, authenticated) => {
+
+              var q = () => {
+                this.oauth_flow.retrieveTokens(this.km, (err, data) => {
                   // if it fail, we fail the whole request
-                  if (err) return next(response)
-                  // then we can rebuffer the request
-                  loggerHttp(`Re-buffering call to ${httpOpts.url} since authenticated now`)
-                  httpOpts.headers.Authorization = `Bearer ${this.tokens.access_token}`
-                  return this._axios.request(httpOpts).then(successNext).catch(next)
+                  if (err) {
+                    loggerHttp(`Failed to retrieve new tokens : ${err.message || err}`)
+                    return next(response)
+                  }
+                  // if its good, we try to update the tokens
+                  loggerHttp(`Succesfully retrieved new tokens`)
+                  this._updateTokens(null, data, (err, authenticated) => {
+                    // if it fail, we fail the whole request
+                    if (err) return next(response)
+                    // then we can rebuffer the request
+                    loggerHttp(`Re-buffering call to ${httpOpts.url} since authenticated now`)
+                    httpOpts.headers.Authorization = `Bearer ${this.tokens.access_token}`
+                    return this._axios.request(httpOpts).then(successNext).catch(next)
+                  })
                 })
-              })
+              }
+              if (httpOpts.url == this.opts.services.OAUTH + '/api/oauth/token') {
+                // Avoid infinite recursive loop to retrieveToken
+                return setTimeout(q.bind(this), 500)
+              }
+              q()
             })
         }
       ], (err, results) => {
