@@ -27,7 +27,7 @@
     "wrapper"
   ],
   "author": "Keymetrics Team",
-  "license": "Apache 2.0",
+  "license": "Apache-2",
   "bugs": {
     "url": "https://github.com/keymetrics/km.js/issues"
   },
@@ -48,7 +48,7 @@
     "jsdoc": "^3.4.2",
     "minami": "^1.1.1",
     "mocha": "^3.0.2",
-    "pm2": "latest",
+    "pm2": "^4.1.2",
     "should": "*",
     "standard": "^10.0.2",
     "uglify-js": "~3.3.7"
