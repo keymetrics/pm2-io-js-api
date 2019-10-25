@@ -34,12 +34,10 @@ local pipeline(version) = {
           event: "tag"
         },
         depends_on: [
-          "node-v4",
-          "node-v6",
-          "node-v7",
           "node-v8",
-          "node-v9",
           "node-v10",
+          "node-v12",
+          "node-v13"
         ],
         steps: [
           {
