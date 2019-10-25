@@ -23,12 +23,10 @@ local pipeline(version) = {
 };
 
 [
-    pipeline("4"),
-    pipeline("6"),
-    pipeline("7"),
     pipeline("8"),
-    pipeline("9"),
     pipeline("10"),
+    pipeline("12"),
+    pipeline("13"),
     {
         kind: "pipeline",
         name: "build & publish",
