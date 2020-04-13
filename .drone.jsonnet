@@ -45,7 +45,7 @@ local pipeline(version) = {
             image: "node:8",
             commands: [
               "yarn 2> /dev/null",
-              "mkdir dist",
+              "mkdir -p dist",
               "yarn run build",
               "yarn run dist",
             ],
