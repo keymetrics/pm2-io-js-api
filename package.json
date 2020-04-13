@@ -33,7 +33,7 @@
   },
   "homepage": "https://github.com/keymetrics/km.js#readme",
   "dependencies": {
-    "async": "^2.4.1",
+    "async": "^2.6.3",
     "axios": "^0.19.0",
     "debug": "^2.6.8",
     "eventemitter2": "^4.1.0",
