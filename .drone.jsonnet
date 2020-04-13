@@ -6,8 +6,8 @@ local pipeline(version) = {
             name: "tests",
             image: "node:" + version,
             commands: [
-              "yarn 2> /dev/null",
-              "yarn run test",
+              "npm install",
+              "npm run test",
             ],
             environment: {
               NODE_ENV: "test",
@@ -44,10 +44,10 @@ local pipeline(version) = {
             name: "build",
             image: "node:8",
             commands: [
-              "yarn 2> /dev/null",
+              "npm 2> /dev/null",
               "mkdir -p dist",
-              "yarn run build",
-              "yarn run dist",
+              "npm run build",
+              "npm run dist",
             ],
           },
           {
