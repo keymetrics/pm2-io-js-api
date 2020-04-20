@@ -44,7 +44,7 @@ local pipeline(version) = {
             name: "build",
             image: "node:8",
             commands: [
-              "npm 2> /dev/null",
+              "npm install 2> /dev/null",
               "mkdir -p dist",
               "npm run build",
               "npm run dist",
