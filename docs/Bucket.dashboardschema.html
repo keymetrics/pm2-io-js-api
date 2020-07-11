@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Dashboard - Documentation</title>
+    <title>dashboardschema - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -27,7 +27,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Dashboard</h1>
+    <h1 class="page-title">dashboardschema</h1>
     
 
     
@@ -40,7 +40,9 @@
 <header>
     
         <h2>
-        Dashboard
+            <span class="ancestors"><a href="Bucket.html">Bucket</a>.</span>
+        
+        dashboardschema
         </h2>
         
     
@@ -167,7 +169,7 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">PUT</td>
-                            <td class="name last">/api/bucket/:id/dashboard/</td>
+                            <td class="name last">/api/bucket/:id/dashboardSchema/</td>
                             </tr>
                             </table>
                             Create a dashboard of a bucket
@@ -191,11 +193,23 @@
             
             <td class="description last">the name of the dashboard</td>
           </tr><tr>
-            <td class="name">children</td>
+            <td class="name">data</td>
             <td class="type">Object</td>
             
             
             <td class="description last">the list of component that compose the dashboard</td>
+          </tr><tr>
+            <td class="name">mode</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">the dashboard mode</td>
+          </tr><tr>
+            <td class="name">image</td>
+            <td class="type">Object</td>
+            
+            
+            <td class="description last">background image for the dashboard</td>
           </tr>
           </table>
                             <h5>Header Parameters:</h5>
@@ -413,7 +427,7 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">DELETE</td>
-                            <td class="name last">/api/bucket/:id/dashboard/:dashid</td>
+                            <td class="name last">/api/bucket/:id/dashboardSchema/:dashid</td>
                             </tr>
                             </table>
                             Remove a dashboard from a bucket
@@ -664,7 +678,7 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">GET</td>
-                            <td class="name last">/api/bucket/:id/dashboard/:dashid</td>
+                            <td class="name last">/api/bucket/:id/dashboardSchema/:dashid</td>
                             </tr>
                             </table>
                             Retrieve dashboards of a bucket
@@ -915,7 +929,7 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">GET</td>
-                            <td class="name last">/api/bucket/:id/dashboard/</td>
+                            <td class="name last">/api/bucket/:id/dashboardSchema/</td>
                             </tr>
                             </table>
                             Retrieve dashboards of a bucket
@@ -1136,7 +1150,7 @@
                             <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
                             <tr>
                             <td class="type">POST</td>
-                            <td class="name last">/api/bucket/:id/dashboard/:dashId</td>
+                            <td class="name last">/api/bucket/:id/dashboardSchema/:dashId</td>
                             </tr>
                             </table>
                             Update a dashboard of a bucket
@@ -1160,11 +1174,11 @@
             
             <td class="description last">the name of the dashboard</td>
           </tr><tr>
-            <td class="name">children</td>
+            <td class="name">data</td>
             <td class="type">Object</td>
             
             
-            <td class="description last">the list of component that compose the dashboard</td>
+            <td class="description last">the data to populate the dashboard</td>
           </tr>
           </table>
                             <h5>Header Parameters:</h5>
@@ -1323,6 +1337,257 @@
         <tr>
             
                 <td class="name"><code>:dashId</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">dashboard id</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="visualization"><span class="type-signature">(route) </span>visualization<span class="signature">(:id, :dashid)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description">
+    <h5>Route:</h5>
+                            <table class="params">
+                            <thead><tr><th>Method</th><th class="last">Path</th></tr></thead>
+                            <tr>
+                            <td class="type">GET</td>
+                            <td class="name last">/api/bucket/:id/dashboardSchema/:dashid/visualization</td>
+                            </tr>
+                            </table>
+                            Retrieve vizualization for dashboard
+                          <h5>Authentication</h5>
+                          <p>A authentication is needed to access this endpoint</p>
+                            <h5>Header Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">Authorization</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">bearer access token issued for the user</td>
+          </tr>
+          </table>
+                            <h5>Route Parameters:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">:id</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">bucket id</td>
+          </tr><tr>
+            <td class="name">:dashid</td>
+            <td class="type">String</td>
+            
+            
+            <td class="description last">dashboard id</td>
+          </tr>
+          </table>
+                            <h5>Response:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            <td class="name">.</td>
+            <td class="type">Array</td>
+            
+            
+            <td class="description last">array of dashboards</td>
+          </tr>
+          </table>
+                            <h5>Response Code:</h5>
+          <table class="params">
+            <thead>
+              <tr>
+                
+                <th>Type</th>
+                
+                
+                <th class="last">Description</th>
+              </tr>
+            </thead>
+            <tr>
+            
+            <td class="type">500</td>
+            
+            
+            <td class="description last">database error</td>
+          </tr><tr>
+            
+            <td class="type">200</td>
+            
+            
+            <td class="description last">succesfully retrieved data</td>
+          </tr><tr>
+            
+            <td class="type">404</td>
+            
+            
+            <td class="description last">dashboard not found</td>
+          </tr><tr>
+            
+            <td class="type">400</td>
+            
+            
+            <td class="description last">Invalid params</td>
+          </tr>
+          </table>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>:id</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">bucket id</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>:dashid</code></td>
             
 
             <td class="type">
