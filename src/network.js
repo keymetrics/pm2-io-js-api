@@ -36,7 +36,7 @@ module.exports = class NetworkWrapper {
       wildcard: true,
       delimiter: ':',
       newListener: false,
-      maxListeners: 20
+      maxListeners: 100
     })
     // https://github.com/EventEmitter2/EventEmitter2/issues/214
     const self = this
