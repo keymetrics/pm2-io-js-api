@@ -1,6 +1,6 @@
 {
   "name": "@pm2/js-api",
-  "version": "0.6.1",
+  "version": "0.6.3",
   "description": "PM2.io API Client for Javascript",
   "main": "index.js",
   "unpkg": "dist/keymetrics.es5.min.js",
@@ -35,7 +35,7 @@
   "dependencies": {
     "async": "^2.6.3",
     "axios": "^0.21.0",
-    "debug": "~3.2.6",
+    "debug": "~4.3.0",
     "eventemitter2": "^6.3.1",
     "ws": "^7.0.0"
   },
