@@ -40,7 +40,7 @@ local pipeline(version) = {
         steps: [
           {
             name: "build",
-            image: "node:12",
+            image: "node:8",
             commands: [
               "npm install 2> /dev/null",
               "mkdir -p dist",
