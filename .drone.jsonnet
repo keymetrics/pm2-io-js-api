@@ -23,10 +23,9 @@ local pipeline(version) = {
 };
 
 [
-    pipeline("8"),
     pipeline("10"),
     pipeline("12"),
-    pipeline("13"),
+    pipeline("14"),
     {
         kind: "pipeline",
         name: "build & publish",
@@ -34,15 +33,14 @@ local pipeline(version) = {
           event: "tag"
         },
         depends_on: [
-          "node-v8",
           "node-v10",
           "node-v12",
-          "node-v13"
+          "node-v14"
         ],
         steps: [
           {
             name: "build",
-            image: "node:8",
+            image: "node:12",
             commands: [
               "npm install 2> /dev/null",
               "mkdir -p dist",

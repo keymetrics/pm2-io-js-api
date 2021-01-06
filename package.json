@@ -13,7 +13,7 @@
     "dist": "mkdir -p dist; browserify -s Keymetrics -r ./ | uglifyjs -c warnings=false -m > ./dist/keymetrics.es5.min.js",
     "doc": "jsdoc -r ./src --readme ./README.md -d doc -t ./node_modules/minami",
     "clean": "rm dist/*",
-    "prepublish": "npm run build && npm run dist"
+    "prepare": "npm run build && npm run dist"
   },
   "repository": {
     "type": "git",
@@ -35,37 +35,37 @@
   "dependencies": {
     "async": "^2.6.3",
     "axios": "^0.21.0",
-    "debug": "~3.2.6",
+    "debug": "~4.3.1",
     "eventemitter2": "^6.3.1",
     "ws": "^7.0.0"
   },
   "devDependencies": {
-    "babel-core": "6.26.0",
-    "babel-preset-es2015": "*",
-    "babel-preset-stage-2": "6.24.1",
-    "babelify": "8.0.0",
-    "browserify": "^13.1.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "babelify": "10.0.0",
+    "browserify": "^17.0.0",
     "jsdoc": "^3.4.2",
     "minami": "^1.1.1",
     "mocha": "^7.0.0",
     "should": "*",
-    "uglify-js": "~3.3.7"
+    "uglify-es": "~3.3.9"
   },
   "browserify": {
-    "debug": "true",
+    "debug": true,
     "transform": [
       [
         "babelify",
         {
           "presets": [
             [
-              "babel-preset-es2015",
+              "@babel/preset-env",
               {
-                "debug": "true",
-                "sourceMaps": "true"
+                "debug": false,
+                "forceAllTransforms": true
               }
             ]
-          ]
+          ],
+          "sourceMaps": true
         }
       ]
     ]
