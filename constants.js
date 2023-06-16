@@ -6,7 +6,7 @@ const config = {
     'X-JS-API-Version': pkg.version
   },
   services: {
-    API: 'https://app.keymetrics.io',
+    API: 'https://api.keymetrics.io',
     OAUTH: 'https://id.keymetrics.io'
   },
   OAUTH_AUTHORIZE_ENDPOINT: '/api/oauth/authorize',
