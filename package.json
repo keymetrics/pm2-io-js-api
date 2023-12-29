@@ -10,7 +10,7 @@
   "scripts": {
     "test": "mocha test/*",
     "build": "mkdir -p dist; browserify -s Keymetrics -r ./ > ./dist/keymetrics.es5.js",
-    "dist": "mkdir -p dist; browserify -s Keymetrics -r ./ | uglifyjs -c warnings=false -m > ./dist/keymetrics.es5.min.js",
+    "dist": "mkdir -p dist; browserify -s Keymetrics -r ./ | uglifyjs -m > ./dist/keymetrics.es5.min.js",
     "doc": "jsdoc -r ./src --readme ./README.md -d doc -t ./node_modules/minami",
     "clean": "rm dist/*",
     "prepare": "npm run build && npm run dist"
@@ -48,7 +48,7 @@
     "minami": "^1.1.1",
     "mocha": "^10.2.0",
     "should": "*",
-    "uglify-es": "~3.3.9"
+    "uglify-js": "^3.17.4"
   },
   "browserify": {
     "debug": true,

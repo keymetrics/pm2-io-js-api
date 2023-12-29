@@ -1,7 +1,7 @@
 
 'use strict'
 
-const axios = require('axios')
+const axios = require('axios/dist/node/axios.cjs') // This is the CJS version of Axios
 const AuthStrategy = require('./auth_strategies/strategy')
 const constants = require('../constants')
 const logger = require('debug')('kmjs:network')
