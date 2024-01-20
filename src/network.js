@@ -1,7 +1,7 @@
 
 'use strict'
 
-const axios = require('axios')
+const extrareqp2 = require('extrareqp2')
 const AuthStrategy = require('./auth_strategies/strategy')
 const constants = require('../constants')
 const logger = require('debug')('kmjs:network')
@@ -25,7 +25,7 @@ module.exports = class NetworkWrapper {
     }
     this.km = km
     this._queue = []
-    this._axios = axios.create(opts)
+    this._extrareqp2 = extrareqp2.create(opts)
     this._websockets = []
     this._endpoints = new Map()
     this._bucketFilters = new Map()
@@ -70,7 +70,7 @@ module.exports = class NetworkWrapper {
       }
     }
 
-    this._axios.interceptors.response.use(
+    this._extrareqp2.interceptors.response.use(
       response => {
         updateApiDateLag(response)
         return response
@@ -108,7 +108,7 @@ module.exports = class NetworkWrapper {
     if (!bucketID) return Promise.reject(new Error(`Missing argument : bucketID`))
 
     if (!this._endpoints.has(bucketID)) {
-      const promise = this._axios.request({
+      const promise = this._extrareqp2.request({
         url: `/api/bucket/${bucketID}`,
         method: 'GET',
         headers: {
@@ -179,7 +179,7 @@ module.exports = class NetworkWrapper {
           }
           httpOpts.headers.Authorization = `Bearer ${this.tokens.access_token}`
 
-          this._axios.request(httpOpts)
+          this._extrareqp2.request(httpOpts)
             .then(successNext)
             .catch((error) => {
               let response = error.response
@@ -207,7 +207,7 @@ module.exports = class NetworkWrapper {
                     // then we can rebuffer the request
                     loggerHttp(`Re-buffering call to ${httpOpts.url} since authenticated now`)
                     httpOpts.headers.Authorization = `Bearer ${this.tokens.access_token}`
-                    return this._axios.request(httpOpts).then(successNext).catch(next)
+                    return this._extrareqp2.request(httpOpts).then(successNext).catch(next)
                   })
                 })
               }
@@ -247,8 +247,8 @@ module.exports = class NetworkWrapper {
 
     loggerHttp(`Registered new access_token : ${data.access_token}`)
     this._websockets.forEach(websocket => websocket.updateAuthorization(data.access_token))
-    this._axios.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
-    this._axios.request({
+    this._extrareqp2.defaults.headers.common['Authorization'] = `Bearer ${data.access_token}`
+    this._extrareqp2.request({
       url: '/api/bucket',
       method: 'GET',
       headers: {

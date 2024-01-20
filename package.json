@@ -1,6 +1,6 @@
 {
   "name": "@pm2/js-api",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "PM2.io API Client for Javascript",
   "main": "index.js",
   "unpkg": "dist/keymetrics.es5.min.js",
@@ -34,7 +34,7 @@
   "homepage": "https://github.com/keymetrics/km.js#readme",
   "dependencies": {
     "async": "^2.6.3",
-    "axios": "^0.21.0",
+    "extrareqp2": "^1.0.0",
     "debug": "~4.3.1",
     "eventemitter2": "^6.3.1",
     "ws": "^7.0.0"
